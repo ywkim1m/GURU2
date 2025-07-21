@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 //    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -60,9 +61,17 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.maps)
+//    implementation(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("androidx.core:core-ktx:1.16.0")
+
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    implementation(libs.lifecycle.viewmodel.ktx)
 }
