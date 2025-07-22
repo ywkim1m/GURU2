@@ -21,7 +21,7 @@ class SpotViewModel(private val repository: SpotRepository): ViewModel() {
     }
 
     // 스팟 insert
-    fun insertSpots(spot: SpotEntity) {
+    fun insertSpot(spot: SpotEntity) {
         viewModelScope.launch {
             repository.insertSpot(spot) // 새로운 스팟 DB에 저장
             loadSpots() // 리스트 새로고침
