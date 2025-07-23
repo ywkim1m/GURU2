@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/btn_add_spot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="스팟 추가(임시)" />
+
+    <Button
+        android:id="@+id/btn_load_spots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="스팟 새로고침" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_spots"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="16dp"/>
+</LinearLayout>

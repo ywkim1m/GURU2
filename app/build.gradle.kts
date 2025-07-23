@@ -74,4 +74,7 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.lifecycle.viewmodel.ktx)
+
+    implementation(libs.kotlin.stdlib)
+
 }

@@ -10,3 +10,13 @@ buildscript {
         classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
     }
 }
+subprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.jetbrains.kotlin" && requested.name.startsWith("kotlin-stdlib")) {
+                useVersion("1.9.24")
+                because("모든 kotlin-stdlib 버전을 1.9.24로 강제")
+            }
+        }
+    }
+}
