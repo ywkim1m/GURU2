@@ -7,7 +7,7 @@ data class MissionWithSpot(
     @Embedded val mission: MissionEntity,
     @Relation(
         parentColumn = "spotId",
-        entityColumn = "spotId"
+        entityColumn = "id"
     )
-    val spot: SpotEntity
+    val spot: SpotEntity?
 )

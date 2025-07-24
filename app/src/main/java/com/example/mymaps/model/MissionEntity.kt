@@ -2,17 +2,19 @@ package com.example.mymaps.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "missions",
     foreignKeys = [
         ForeignKey(
             entity = SpotEntity::class,
-            parentColumns = ["spotId"],
+            parentColumns = ["id"],
             childColumns = ["spotId"],
             onDelete = ForeignKey.CASCADE
         )
-    ])
+    ],
+    indices = [Index(value = ["spotId"])])
 data class MissionEntity(
     @PrimaryKey val missionId: String,  // 미션 아이디
     val title: String,  // 미션 이름
