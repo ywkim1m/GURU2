@@ -18,14 +18,14 @@
         <!--<activity
             android:name=".ui.SpotTestActivity"
             android:exported="false" />-->
-        <activity
+        <!--<activity
             android:name=".ui.SpotTestActivity"
-            android:exported="true"> <!-- 테스트니까 true 해도 무방 -->
+            android:exported="true"> &lt;!&ndash; 테스트니까 true 해도 무방 &ndash;&gt;
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity>-->
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -41,7 +41,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
-        <!--<activity
+        <activity
             android:name=".MapsActivity"
             android:exported="true"
             android:label="@string/title_activity_maps">
@@ -51,7 +51,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
+        <!--<activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
