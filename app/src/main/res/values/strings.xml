@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MyMaps</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="back">뒤로가기</string>
 </resources>

@@ -77,4 +77,7 @@ dependencies {
 
     implementation(libs.kotlin.stdlib)
 
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    ksp("com.github.bumptech.glide:ksp:4.16.0")
+
 }
