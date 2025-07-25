@@ -32,4 +32,7 @@ interface MissionDao {
     @Query("SELECT * FROM missions WHERE isCompleted = 0")
     suspend fun  getUncompletedMissions(): List<MissionEntity>
 
+    // 미션 방문 인증 정보 부분 업데이트
+    @Query("UPDATE missions SET isCompleted = 1, visitedDate = :visitedDate, proofPhotoUri = :proofPhotoUri WHERE missionId = :missionId")
+    suspend fun completeMissionWithProof(missionId: String, visitedDate: String, proofPhotoUri: String?)
 }

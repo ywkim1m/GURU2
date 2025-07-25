@@ -57,4 +57,34 @@ class MissionViewModel(private val repository: MissionRepository): ViewModel() {
             _allMissions.value = repository.getUncompletedMissions()
         }
     }
+
+    // 방문 인증 처리 함수
+    fun completeMissionWithProof(
+        missionId: String,
+        visitedDate: String,
+        proofPhotoUri: String?
+    ) {
+        viewModelScope.launch {
+            repository.completeMissionWithProof(missionId, visitedDate, proofPhotoUri)
+            loadMissions()
+        }
+    }
+
+    // 방문 인증시 spot visited 처리
+    fun completeMissionAndMarkSpotVisited(
+        missionId: String,
+        visitedDate: String,
+        proofPhotoUri: String?,
+        spotId: Int?
+    ) {
+        viewModelScope.launch {
+            repository.completeMissionAndMarkSpotVisited(
+                missionId,
+                visitedDate,
+                proofPhotoUri,
+                spotId
+            )
+            loadMissions() // 미션 리스트 갱신
+        }
+    }
 }
