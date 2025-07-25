@@ -3,10 +3,13 @@ package com.example.mymaps.repository
 import com.example.mymaps.model.MissionDao
 import com.example.mymaps.model.MissionEntity
 import com.example.mymaps.model.MissionWithSpot
+import com.example.mymaps.model.SpotDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class MissionRepository(private val missionDao: MissionDao) {
+class MissionRepository(private val missionDao: MissionDao,
+                        private val spotDao: SpotDao
+) {
 
     //
     suspend fun getMissionWithSpot(missionId: String): MissionWithSpot? {
@@ -52,6 +55,30 @@ class MissionRepository(private val missionDao: MissionDao) {
     suspend fun getUncompletedMissions(): List<MissionEntity> {
         return withContext(Dispatchers.IO) {
             missionDao.getUncompletedMissions()
+        }
+    }
+
+    // 방문 인증 처리 함수
+    suspend fun completeMissionWithProof(
+        missionId: String,
+        visitedDate: String,
+        proofPhotoUri: String?
+    ) {
+        withContext(Dispatchers.IO) {
+            missionDao.completeMissionWithProof(missionId, visitedDate, proofPhotoUri)
+        }
+    }
+
+    // 미션 완료 시 spot visited 처리
+    suspend fun completeMissionAndMarkSpotVisited(
+        missionId: String,
+        visitedDate: String,
+        proofPhotoUri: String?,
+        spotId: Int?    // Spot의 PK, null 방지
+    ) {
+        withContext(Dispatchers.IO) {
+            missionDao.completeMissionWithProof(missionId, visitedDate, proofPhotoUri)
+            spotId?.let { spotDao.markSpotAsVisited(it) }
         }
     }
 }

@@ -35,4 +35,8 @@ interface SpotDao {
     // 방문한 스팟 불러오기
     @Query("SELECT * FROM spots WHERE isVisited = 1")
     suspend fun getVisitedSpots(): List<SpotEntity>
+
+    // 스팟 방문 시
+    @Query("UPDATE spots SET isVisited = 1 WHERE id = :spotId")
+    suspend fun markSpotAsVisited(spotId: Int)
 }
