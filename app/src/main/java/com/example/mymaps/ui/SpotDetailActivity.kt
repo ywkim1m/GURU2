@@ -20,8 +20,15 @@ import android.view.Gravity
 import android.view.View
 import android.net.Uri
 import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.viewModels
+import com.example.mymaps.model.SpotCategory
+import com.example.mymaps.model.SpotEntity
+import com.example.mymaps.viewmodel.SpotViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SpotDetailActivity : AppCompatActivity() {
+    private val spotViewModel: SpotViewModel by viewModels()
 
     private lateinit var btnBack: ImageButton
     private lateinit var ivSpotImage: ImageView
@@ -108,18 +115,40 @@ class SpotDetailActivity : AppCompatActivity() {
         }
 
 
-        // '등록하기' 버튼 클릭 리스너
+        // '등록하기' 버튼 클릭 리스너, DB에 저장
         btnRegisterSpot.setOnClickListener {
-            val spotTitle = etPlaceName.text.toString()
-            val spotDescription = etSpotDescription.text.toString()
+            val spotTitle = etPlaceName.text.toString() // 장소명
+            val spotDescription = etSpotDescription.text.toString() // 장소 설명
+            val spotAddress = etPlaceAddress.text.toString()    // 도로명 주소
+            val latitude = intent.getDoubleExtra("latitude", 0.0)   // 위도
+            val longitude = intent.getDoubleExtra("longitude", 0.0) // 경도
+            val photoUri = selectedImageUri?.toString() // 장소 사진
 
+            // 카테고리(Chip에서 첫 번째 선택값 Enum 변환)
             val allCategories = mutableListOf<String>()
             for (i in 0 until chipGroupCategories.childCount) {
                 val chip = chipGroupCategories.getChildAt(i) as Chip
                 allCategories.add(chip.text.toString())
             }
+            val categoryStr = if (allCategories.isNotEmpty()) allCategories[0] else "ETC"
+            val spotCategory = try {
+                SpotCategory.valueOf(categoryStr)
+            } catch (e: Exception) {
+                SpotCategory.ETC
+            }
 
-            // TODO: spotTitle, spotDescription, allCategories, latitude, longitude, placeAddress, selectedImageUri 저장 처리
+            val spotEntity = SpotEntity(
+                name = spotTitle,
+                description = spotDescription,
+                photoUri = photoUri,
+                category = spotCategory,
+                roadAddress = spotAddress,
+                latitude = latitude,
+                longitude = longitude,
+                isSaved = true
+            )
+
+            spotViewModel.insertSpot(spotEntity)
             Toast.makeText(this, "스팟을 추가했어요", Toast.LENGTH_LONG).show()
             finish()
         }

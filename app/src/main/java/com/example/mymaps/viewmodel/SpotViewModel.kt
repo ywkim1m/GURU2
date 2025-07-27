@@ -7,8 +7,13 @@ import com.example.mymaps.repository.SpotRepository
 import kotlinx.coroutines.launch
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class SpotViewModel(private val repository: SpotRepository): ViewModel() {
+@HiltViewModel
+class SpotViewModel @Inject constructor(
+    private val repository: SpotRepository
+): ViewModel() {
     // XML UI에서 LiveData를 observe하면 값이 바뀔 때 자동으로 UI가 업데이트
     private val _allSpots = MutableLiveData<List<SpotEntity>>() // 내부 상태(수정 가능)
     val allSpots: LiveData<List<SpotEntity>> = _allSpots // 외부 공개(읽기 전용)

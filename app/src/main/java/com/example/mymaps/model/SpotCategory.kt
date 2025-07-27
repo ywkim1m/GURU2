@@ -6,5 +6,6 @@ enum class SpotCategory {
     HIDDEN_GEM,   // 숨은 맛집
     NATURAL_VIEW,   //자연경관
     PHOTO_SPOT,   // 포토존
-    WALKING_ROUTE   // 산책루트
+    WALKING_ROUTE,   // 산책루트,
+    ETC // 기타
 }

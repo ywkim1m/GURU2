@@ -5,8 +5,10 @@ import com.example.mymaps.model.SpotDao
 import com.example.mymaps.model.SpotEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class SpotRepository(private val spotDao: SpotDao) {
+class SpotRepository @Inject constructor(
+    private val spotDao: SpotDao) {
 
     // 스팟 insert
     suspend fun insertSpot(spot: SpotEntity) {
