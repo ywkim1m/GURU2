@@ -2,4 +2,8 @@
     <string name="app_name">MyMaps</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="back">뒤로가기</string>
+    <string name="place_label">장소명 <font color='#FF763C'> *</font></string>
+    <string name="address_label">주소 <font color='#FF763C'> *</font></string>
+    <string name="description_label">설명 <font color='#FF763C'> *</font></string>
+    <string name="category_label">카테고리 <font color='#FF763C'> *</font></string>
 </resources>

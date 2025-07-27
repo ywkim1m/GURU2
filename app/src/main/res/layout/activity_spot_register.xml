@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".SpotRegisterActivity">
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/centerMarker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="264dp"
+        android:layout_marginEnd="176dp"
+        android:background="@drawable/marker_background"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="10dp"
+        android:text="여기"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/centerMarkerBar"
+        android:layout_width="9dp"
+        android:layout_height="22dp"
+        android:layout_below="@id/centerMarker"
+        android:layout_alignStart="@id/centerMarker"
+        android:layout_marginTop="0dp"
+        android:layout_marginStart="27.5dp"
+        android:src="@drawable/markerpin"/>
+
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="닫기"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:scaleType="fitCenter"
+        android:padding="8dp" />
+
+    <ImageButton
+        android:id="@+id/btnMyLocationCustom"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/circle_button_background"
+        android:contentDescription="내 위치"
+        android:src="@drawable/ic_my_location"
+        android:scaleType="fitCenter"
+        android:padding="8dp"
+        android:elevation="4dp" />
+
+    <LinearLayout
+        android:id="@+id/bottomCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:padding="16dp"
+        android:elevation="8dp">
+
+        <TextView
+            android:id="@+id/tvPlaceName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="장소명"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/tvPlaceAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="주소"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"
+            android:textColor="@android:color/darker_gray" />
+
+        <Button
+            android:id="@+id/btnAddSpot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="스팟 추가"
+            android:layout_gravity="end"
+            android:backgroundTint="#FF7A00"
+            android:textColor="@android:color/white"
+            android:paddingHorizontal="28dp"
+            android:paddingVertical="10dp"
+            android:textSize="16sp" />
+    </LinearLayout>
+</RelativeLayout>
