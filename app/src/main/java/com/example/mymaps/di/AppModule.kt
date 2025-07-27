@@ -3,11 +3,13 @@ package com.example.mymaps.di
 import android.content.Context
 import androidx.room.Room
 import com.example.mymaps.data.AppDatabase
+import com.example.mymaps.data.UserPrefsManager
 import com.example.mymaps.model.SpotDao
 import com.example.mymaps.repository.SpotRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -33,10 +35,17 @@ object AppModule {
         return database.spotDao()
     }
 
-    // Repository도 주입
+    // Repository 주입
     @Provides
     @Singleton
     fun provideSpotRepository(spotDao: SpotDao): SpotRepository {
          return SpotRepository(spotDao)
-     }
+    }
+
+    // Preference Manager 주입
+    @Provides
+    @Singleton
+    fun provideUserPrefsManager(
+        @ApplicationContext context: Context
+    ): UserPrefsManager = UserPrefsManager(context)
 }

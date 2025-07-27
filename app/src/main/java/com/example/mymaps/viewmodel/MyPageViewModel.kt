@@ -4,8 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.mymaps.data.UserPrefsManager
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MyPageViewModel(private val prefs: UserPrefsManager): ViewModel() {
+@HiltViewModel
+class MyPageViewModel @Inject constructor(private val prefs: UserPrefsManager): ViewModel() {
     // LiveData: UI에서 observe하면 자동 업데이트
     private val _userName = MutableLiveData<String>()
     val userName: LiveData<String> get() = _userName
