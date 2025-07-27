@@ -124,29 +124,36 @@ class SpotDetailActivity : AppCompatActivity() {
             val longitude = intent.getDoubleExtra("longitude", 0.0) // 경도
             val photoUri = selectedImageUri?.toString() // 장소 사진
 
-            // 카테고리(Chip에서 첫 번째 선택값 Enum 변환)
+            // 카테고리 추출
+            var pickedCategoryPinColorResId = 0
             val allCategories = mutableListOf<String>()
-            for (i in 0 until chipGroupCategories.childCount) {
-                val chip = chipGroupCategories.getChildAt(i) as Chip
-                allCategories.add(chip.text.toString())
+            var categoryStr = "ETC"
+            if (chipGroupCategories.childCount > 0) {
+                val firstChip = chipGroupCategories.getChildAt(0) as Chip
+                allCategories.add(firstChip.text.toString())
+                categoryStr = firstChip.text.toString()
+
+                pickedCategoryPinColorResId = firstChip.tag as? Int ?: 0
             }
-            val categoryStr = if (allCategories.isNotEmpty()) allCategories[0] else "ETC"
-            val spotCategory = try {
-                SpotCategory.valueOf(categoryStr)
+            val (categoryEnum, customCategory) = try {
+                SpotCategory.valueOf(categoryStr) to null
             } catch (e: Exception) {
-                SpotCategory.ETC
+                SpotCategory.ETC to categoryStr
             }
 
             val spotEntity = SpotEntity(
                 name = spotTitle,
                 description = spotDescription,
                 photoUri = photoUri,
-                category = spotCategory,
+                categoryEnum = categoryEnum,
+                categoryName = customCategory,
+                categoryPinColorResId = pickedCategoryPinColorResId,
                 roadAddress = spotAddress,
                 latitude = latitude,
                 longitude = longitude,
                 isSaved = true
             )
+
 
             spotViewModel.insertSpot(spotEntity)
             Toast.makeText(this, "스팟을 추가했어요", Toast.LENGTH_LONG).show()
@@ -203,6 +210,8 @@ class SpotDetailActivity : AppCompatActivity() {
             chip.chipIcon = drawable
             chip.isChipIconVisible = true
         }
+
+        chip.tag = iconResId
 
         chip.setOnCheckedChangeListener { chipView, isChecked ->
         }

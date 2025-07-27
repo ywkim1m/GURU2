@@ -7,6 +7,7 @@ import com.example.mymaps.repository.SpotRepository
 import kotlinx.coroutines.launch
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
+import com.example.mymaps.model.SpotCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -74,6 +75,20 @@ class SpotViewModel @Inject constructor(
     fun loadVisitedSpots() {
         viewModelScope.launch {
             _allSpots.value = repository.getVisitedSpots()
+        }
+    }
+
+    // 특정 Enum 카테고리별 조회
+    fun loadSpotsByEnum(categoryEnum: SpotCategory) {
+        viewModelScope.launch {
+            _allSpots.value = repository.getSpotsByCategoryEnum(categoryEnum)
+        }
+    }
+
+    // 커스텀 카테고리별 조회
+    fun loadSpotsByCustomCategory(categoryName: String) {
+        viewModelScope.launch {
+            _allSpots.value = repository.getSpotsByCustomCategory(categoryName)
         }
     }
 }

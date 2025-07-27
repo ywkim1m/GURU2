@@ -9,7 +9,10 @@ data class SpotEntity(
     val name: String,   // 장소명
     val description: String,    // 장소 설명
     val photoUri: String?,  // 장소 사진
-    val category: SpotCategory, // 카테고리
+    // enum(선택 or NONE) + string(유저가 추가한 경우)
+    val categoryEnum: SpotCategory? = SpotCategory.ETC,
+    val categoryName: String? = "",
+    val categoryPinColorResId: Int = 0,
     val roadAddress: String?, // 도로명주소
     val latitude: Double,     // 위도
     val longitude: Double,  // 경도
