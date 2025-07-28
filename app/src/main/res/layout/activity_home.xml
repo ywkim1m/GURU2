@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FFFFFF"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 상단 로고 -->
+    <LinearLayout
+        android:id="@+id/top_logo_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/store_logo"
+            android:layout_width="140dp"
+            android:layout_height="64dp"
+            android:src="@drawable/logo"
+            android:contentDescription="로고"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <!-- 카테고리 바 (네 칩 모두 표시, 좌우 여백/배경 동일) -->
+    <LinearLayout
+        android:id="@+id/category_section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/cr24b1b1b1b"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="6dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/cr12bf14a41"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="산책루트"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/se0e0e0sw1cr24"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="6dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/cr12bff763c"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="숨은맛집"
+                android:textColor="#3F3F3F"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/se0e0e0sw1cr24"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:layout_marginEnd="6dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/cr12bffc400"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="포토존"
+                android:textColor="#3F3F3F"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/se0e0e0sw1cr24"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="16dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/cr12b34c759"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="벤치"
+                android:textColor="#3F3F3F"
+                android:textSize="14sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 여기부터 스크롤(이미지뷰+텍스트) -->
+    <ScrollView
+        android:id="@+id/scroll_section"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#FFFFFF"
+        android:overScrollMode="always"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:id="@+id/image_scroll_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingVertical="18dp"
+                android:orientation="horizontal"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvImageCarousel"
+                    android:layout_width="match_parent"
+                    android:layout_height="301dp"
+                    android:clipToPadding="false"
+                    android:clipChildren="false"
+                    android:overScrollMode="never"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="18dp"
+                    tools:listitem="@layout/item_image_card" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/desc_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="40dp"
+                android:layout_marginBottom="20dp"
+                android:textColor="#3F3F3F"
+                android:textSize="16sp"
+                android:text="무거운 물품이 있는 경우 장보기용 카트를 대여해주는 곳! 계단을 올라가서 오른쪽으로 꺽으면 ‘마타줌’이라는 깃발이 보인다. 길어지면 스크롤됩니다."/>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 좋아요/싫어요 버튼 -->
+    <LinearLayout
+        android:id="@+id/like_dislike_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="32dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/like_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/good_img"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="2dp"
+                android:src="@drawable/good"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/dislike_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/bad_img"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="2dp"
+                android:src="@drawable/bad"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 네비게이션 바 -->
+    <LinearLayout
+        android:id="@+id/nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:paddingVertical="12dp"
+        android:gravity="center"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <ImageView
+            android:id="@+id/bar_one"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/bar_one"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true" />
+
+        <ImageView
+            android:id="@+id/bar_two"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/bar_two"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true" />
+
+        <ImageView
+            android:id="@+id/bar_three"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/bar_three"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true" />
+    </LinearLayout>
+
+    <!-- 바텀 마진(필요시) -->
+    <LinearLayout
+        android:id="@+id/bottom_space"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="0dp"
+        android:background="#EEEEEE"/>
+</LinearLayout>

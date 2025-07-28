@@ -8,11 +8,8 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
 import com.example.mymaps.model.SpotCategory
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
-@HiltViewModel
-class SpotViewModel @Inject constructor(
+class SpotViewModel(
     private val repository: SpotRepository
 ): ViewModel() {
     // XML UI에서 LiveData를 observe하면 값이 바뀔 때 자동으로 UI가 업데이트

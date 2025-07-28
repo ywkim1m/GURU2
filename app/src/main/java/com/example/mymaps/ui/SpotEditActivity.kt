@@ -3,36 +3,35 @@ package com.example.mymaps.ui
 import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.text.Html
-import android.util.TypedValue
 import android.view.ContextThemeWrapper
+import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import android.view.Gravity
-import android.view.View
-import android.net.Uri
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.viewModels
-import com.example.mymaps.R
 import com.example.mymaps.model.SpotCategory
 import com.example.mymaps.model.SpotEntity
 import com.example.mymaps.viewmodel.SpotViewModel
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+import androidx.activity.viewModels
+import com.example.mymaps.CategoryAdd
+import com.example.mymaps.R
 
-class SpotDetailActivity : AppCompatActivity() {
+class SpotEditActivity : AppCompatActivity() {
     private val spotViewModel: SpotViewModel by viewModels()
 
     private lateinit var btnBack: ImageButton
     private lateinit var ivSpotImage: ImageView
     private lateinit var etPlaceName: EditText
-    private lateinit var etPlaceAddress: EditText
+    private lateinit var etAddress: EditText
     private lateinit var etSpotDescription: EditText
     private lateinit var chipGroupCategories: ChipGroup
     private lateinit var btnRegisterSpot: Button
@@ -44,14 +43,14 @@ class SpotDetailActivity : AppCompatActivity() {
 
     private lateinit var addCategoryLauncher: ActivityResultLauncher<Intent>
     private lateinit var pickImageLauncher: ActivityResultLauncher<PickVisualMediaRequest>
-
     private var selectedImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_spot_detail)
+        setContentView(R.layout.activity_spot_edit)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.SpotRegist)) { v, insets ->
+        // Window Insets 적용 (root id = SpotEdit)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.SpotEdit)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -60,7 +59,7 @@ class SpotDetailActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.btnBack)
         ivSpotImage = findViewById(R.id.ivSpotImage)
         etPlaceName = findViewById(R.id.etPlaceName)
-        etPlaceAddress = findViewById(R.id.etAddress)
+        etAddress = findViewById(R.id.etAddress)
         etSpotDescription = findViewById(R.id.etSpotDescription)
         chipGroupCategories = findViewById(R.id.chipGroupCategories)
         btnRegisterSpot = findViewById(R.id.btnRegisterSpot)
@@ -80,14 +79,13 @@ class SpotDetailActivity : AppCompatActivity() {
         val placeAddress = intent.getStringExtra("placeAddress")
 
         etPlaceName.setText(placeName)
-        etPlaceAddress.setText(placeAddress)
+        etAddress.setText(placeAddress)
 
         addCategoryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.let { data ->
                     val categoryName = data.getStringExtra("categoryName")
                     val categoryPinColorResId = data.getIntExtra("categoryPinColorResId", 0)
-
                     if (categoryName != null && categoryPinColorResId != 0) {
                         addCategoryChip(categoryName, categoryPinColorResId)
                     }
@@ -102,36 +100,29 @@ class SpotDetailActivity : AppCompatActivity() {
             }
         }
 
+        // 뒤로가기 버튼
+        btnBack.setOnClickListener { finish() }
 
-        // 뒤로가기 버튼 클릭 리스너
-        btnBack.setOnClickListener {
-            finish()
-        }
-
-        // 이미지 뷰 클릭 리스너
+        // 대표 이미지 클릭
         ivSpotImage.setOnClickListener {
             pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
-
-        // '등록하기' 버튼 클릭 리스너, DB에 저장
+        // 등록(저장) 버튼
         btnRegisterSpot.setOnClickListener {
-            val spotTitle = etPlaceName.text.toString() // 장소명
-            val spotDescription = etSpotDescription.text.toString() // 장소 설명
-            val spotAddress = etPlaceAddress.text.toString()    // 도로명 주소
-            val latitude = intent.getDoubleExtra("latitude", 0.0)   // 위도
-            val longitude = intent.getDoubleExtra("longitude", 0.0) // 경도
-            val photoUri = selectedImageUri?.toString() // 장소 사진
+            val spotTitle = etPlaceName.text.toString()
+            val spotDescription = etSpotDescription.text.toString()
+            val spotAddress = etAddress.text.toString()
+            val latitude = intent.getDoubleExtra("latitude", 0.0)
+            val longitude = intent.getDoubleExtra("longitude", 0.0)
+            val photoUri = selectedImageUri?.toString()
 
-            // 카테고리 추출
+            // 첫 번째 chip만 대표 카테고리로 저장 (여러개도 선택 가능하면 변경)
             var pickedCategoryPinColorResId = 0
-            val allCategories = mutableListOf<String>()
             var categoryStr = "ETC"
             if (chipGroupCategories.childCount > 0) {
                 val firstChip = chipGroupCategories.getChildAt(0) as Chip
-                allCategories.add(firstChip.text.toString())
                 categoryStr = firstChip.text.toString()
-
                 pickedCategoryPinColorResId = firstChip.tag as? Int ?: 0
             }
             val (categoryEnum, customCategory) = try {
@@ -153,28 +144,25 @@ class SpotDetailActivity : AppCompatActivity() {
                 isSaved = true
             )
 
-
             spotViewModel.insertSpot(spotEntity)
             Toast.makeText(this, "스팟을 추가했어요", Toast.LENGTH_LONG).show()
             finish()
         }
 
-        // '추가' 버튼 (btnAddCategory) 클릭 리스너
+        // 카테고리 추가
         btnAddCategory.setOnClickListener {
             val intent = Intent(this, CategoryAdd::class.java)
             addCategoryLauncher.launch(intent)
         }
 
-        // '삭제' 버튼 (btnDeleteCategory) 클릭 리스너
+        // 카테고리 삭제
         btnDeleteCategory.setOnClickListener {
             val selectedChipIds = chipGroupCategories.checkedChipIds
             val chipsToRemove = mutableListOf<Chip>()
 
             for (id in selectedChipIds) {
                 val chip = findViewById<Chip>(id)
-                if (chip != null) {
-                    chipsToRemove.add(chip)
-                }
+                if (chip != null) chipsToRemove.add(chip)
             }
 
             var deletedCount = 0
@@ -191,10 +179,12 @@ class SpotDetailActivity : AppCompatActivity() {
         }
     }
 
+    // 라벨 필수 표시
     private fun setRequiredLabel(textView: TextView, label: String) {
         textView.text = Html.fromHtml("$label <font color='#FF763C'>*</font>", Html.FROM_HTML_MODE_LEGACY)
     }
 
+    // chip 추가
     private fun addCategoryChip(name: String, iconResId: Int) {
         val chip = Chip(ContextThemeWrapper(this, R.style.AppChipStyle))
         chip.text = name
@@ -212,13 +202,11 @@ class SpotDetailActivity : AppCompatActivity() {
 
         chip.tag = iconResId
 
-        chip.setOnCheckedChangeListener { chipView, isChecked ->
-        }
-
         val layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
+        // chip margin
         layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.chip_horizontal_margin)
         chipGroupCategories.addView(chip, layoutParams)
     }

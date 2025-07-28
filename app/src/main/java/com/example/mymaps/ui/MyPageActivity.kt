@@ -1,4 +1,4 @@
-package com.example.mymaps
+package com.example.mymaps.ui
 
 import android.Manifest
 import android.content.Intent
@@ -14,7 +14,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mymaps.R
+import com.example.mymaps.adapter.BadgeAdapter
 import com.example.mymaps.model.SpotEntity
+import com.example.mymaps.viewmodel.BadgeViewModel
 import com.example.mymaps.viewmodel.MyPageViewModel
 import com.example.mymaps.viewmodel.SpotViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -28,13 +33,13 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
-@AndroidEntryPoint
 class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
     private val spotViewModel: SpotViewModel by viewModels()
     private val myPageViewModel: MyPageViewModel by viewModels()
+    private val badgeViewModel: BadgeViewModel by viewModels()
+    private lateinit var badgeAdapter: BadgeAdapter
 
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -95,7 +100,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_my_page) // 마이페이지 레이아웃 사용
+        setContentView(R.layout.activity_my_page)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -103,6 +108,18 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
         btnMyLocationCustom = findViewById(R.id.btnMyLocationCustom)
         // tvNickname = findViewById(R.id.tvNickname)
         tvLevelText = findViewById(R.id.tvLevelText)
+
+        // 뱃지 리스트 추가
+        // BadgeAdapter 생성
+        badgeAdapter = BadgeAdapter(emptyList())
+        // RecyclerView 연결
+        val rvBadges = findViewById<RecyclerView>(R.id.rvBadges)
+        rvBadges.adapter = badgeAdapter
+        rvBadges.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        // 뷰모델에서 뱃지 LiveData observe
+        badgeViewModel.badges.observe(this) { badges ->
+            badgeAdapter.updateList(badges)
+        }
 
         // MyPageViewModel에서 LiveData로 userPrefs에 저장된 값 반영
         myPageViewModel.userLevel.observe(this) { level ->
@@ -118,9 +135,9 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
         // SpotViewModel에서 LiveData로 SpotEntity 전체 불러오기
         spotViewModel.allSpots.observe(this) { spotList ->
             updateSpotsByType(spotList)
-            displayMarkersForCurrentFilter() // 화면 갱신
+            displayMarkersForCurrentFilter()
         }
-        spotViewModel.loadSpots() // 실제 DB에서 로드
+        spotViewModel.loadSpots()
 
         // Map 초기화
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
@@ -129,6 +146,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
         // 필터 버튼 클릭 리스너 설정
         setupFilterButtons()
     }
+
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
