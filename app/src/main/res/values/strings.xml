@@ -6,4 +6,5 @@
     <string name="address_label">주소 <font color='#FF763C'> *</font></string>
     <string name="description_label">설명 <font color='#FF763C'> *</font></string>
     <string name="category_label">카테고리 <font color='#FF763C'> *</font></string>
+    <string name="badge_icon">뱃지 아이콘</string>
 </resources>

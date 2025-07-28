@@ -20,6 +20,14 @@ interface SpotDao {
     @Query("SELECT * FROM spots")
     suspend fun getAllSpots(): List<SpotEntity>
 
+    // 특정 enum 카테고리의 스팟
+    @Query("SELECT * FROM spots WHERE categoryEnum = :categoryEnum")
+    suspend fun getSpotsByCategoryEnum(categoryEnum: SpotCategory): List<SpotEntity>
+
+    // 커스텀(직접입력) 카테고리의 스팟
+    @Query("SELECT * FROM spots WHERE categoryEnum = :etcEnum AND categoryName = :categoryName")
+    suspend fun getSpotsByCustomCategory(etcEnum: SpotCategory = SpotCategory.ETC, categoryName: String): List<SpotEntity>
+
     // 저장한 스팟 불러오기
     @Query("SELECT * FROM spots WHERE isSaved = 1")
     suspend fun getSavedSpots(): List<SpotEntity>

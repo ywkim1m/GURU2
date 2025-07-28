@@ -1,4 +1,4 @@
-package com.example.mymaps
+package com.example.mymaps.ui
 
 import android.Manifest
 import android.content.Intent
@@ -11,8 +11,17 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mymaps.R
+import com.example.mymaps.adapter.BadgeAdapter
+import com.example.mymaps.model.SpotEntity
+import com.example.mymaps.viewmodel.BadgeViewModel
+import com.example.mymaps.viewmodel.MyPageViewModel
+import com.example.mymaps.viewmodel.SpotViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,19 +36,28 @@ import com.google.android.gms.maps.model.MarkerOptions
 import java.util.*
 
 class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
+    private val spotViewModel: SpotViewModel by viewModels()
+    private val myPageViewModel: MyPageViewModel by viewModels()
+    private val badgeViewModel: BadgeViewModel by viewModels()
+    private lateinit var badgeAdapter: BadgeAdapter
 
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private lateinit var btnMyLocationCustom: ImageButton
     // private lateinit var tvNickname: TextView
-    // private lateinit var tvLevelText: TextView
+    private lateinit var tvLevelText: TextView
 
     // 핀 필터링 TextViews
     private lateinit var tvFilterRegistered: TextView
     private lateinit var tvFilterLiked: TextView
     private lateinit var tvFilterDisliked: TextView
     private lateinit var tvFilterVisited: TextView
+
+    private var registeredSpots: List<SpotEntity> = emptyList()
+    private var likedSpots: List<SpotEntity> = emptyList()
+    private var dislikedSpots: List<SpotEntity> = emptyList()
+    private var visitedSpots: List<SpotEntity> = emptyList()
 
     // 네비게이션 바 ImageButtons
     // private lateinit var btnHome: ImageButton
@@ -49,7 +67,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
     // 공릉동 도깨비시장 좌표 (초기 지도 위치)
     private val GONGNEUNG_DOKKAEBI_MARKET = LatLng(37.6256, 127.0782)
 
-    // 임시 데이터 클래스
+    /*// 임시 데이터 클래스
     data class Spot(val id: String, val name: String, val latLng: LatLng, val category: String, val visited: Boolean = false)
 
     // 임시 스팟 데이터 (실제 DB 연동 시 이 부분 대체)
@@ -65,7 +83,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
         Spot("V1", "방문1 도깨비시장", LatLng(37.6256, 127.0782), "시장", true),
         Spot("V2", "방문2 공릉철길", LatLng(37.6190, 127.0770), "공원", true),
         Spot("V3", "미방문 베이커리", LatLng(37.6230, 127.0790), "빵집", false) // 미방문 예시
-    )
+    )*/
 
     private var currentMarkers = mutableListOf<Marker>()
     private var currentFilterType: String = "등록한 스팟" // 초기 필터 타입
@@ -82,35 +100,44 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_my_page) // 마이페이지 레이아웃 사용
+        setContentView(R.layout.activity_my_page)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // View 초기화
         btnMyLocationCustom = findViewById(R.id.btnMyLocationCustom)
         // tvNickname = findViewById(R.id.tvNickname)
-        // tvLevelText = findViewById(R.id.tvLevelText)
+        tvLevelText = findViewById(R.id.tvLevelText)
+
+        // 뱃지 리스트 추가
+        // BadgeAdapter 생성
+        badgeAdapter = BadgeAdapter(emptyList())
+        // RecyclerView 연결
+        val rvBadges = findViewById<RecyclerView>(R.id.rvBadges)
+        rvBadges.adapter = badgeAdapter
+        rvBadges.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        // 뷰모델에서 뱃지 LiveData observe
+        badgeViewModel.badges.observe(this) { badges ->
+            badgeAdapter.updateList(badges)
+        }
+
+        // MyPageViewModel에서 LiveData로 userPrefs에 저장된 값 반영
+        myPageViewModel.userLevel.observe(this) { level ->
+            updateLevelText(level)
+        }
+        myPageViewModel.loadUserData()
 
         tvFilterRegistered = findViewById(R.id.tvFilterRegistered)
         tvFilterLiked = findViewById(R.id.tvFilterLiked)
         tvFilterDisliked = findViewById(R.id.tvFilterDisliked)
         tvFilterVisited = findViewById(R.id.tvFilterVisited)
 
-//        // 네비게이션 바 버튼 초기화
-//        btnHome = findViewById(R.id.btnHome)
-//        btnAddSpotNav = findViewById(R.id.btnAddSpotNav)
-//        btnMyPageNav = findViewById(R.id.btnMyPageNav)
-
-
-        // 스팟 등록 화면에서 전달된 데이터 받기 (MyPageActivity로 직접 연결될 경우)
-        intent.getParcelableExtra<LatLng>("registered_spot_latlng")?.let { latLng ->
-            intent.getStringExtra("registered_spot_name")?.let { name ->
-                intent.getStringExtra("registered_spot_address")?.let { address ->
-                    registeredSpots.add(Spot("R${registeredSpots.size + 1}", name, latLng, "등록된 스팟"))
-                    Toast.makeText(this, "새로운 스팟이 등록되었습니다: $name", Toast.LENGTH_SHORT).show()
-                }
-            }
+        // SpotViewModel에서 LiveData로 SpotEntity 전체 불러오기
+        spotViewModel.allSpots.observe(this) { spotList ->
+            updateSpotsByType(spotList)
+            displayMarkersForCurrentFilter()
         }
+        spotViewModel.loadSpots()
 
         // Map 초기화
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
@@ -118,19 +145,8 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 필터 버튼 클릭 리스너 설정
         setupFilterButtons()
-
-        // 네비게이션 바 버튼 클릭 리스너
-        // setupBottomNavigationButtons()
-        // 마이페이지 진입 시 마이페이지 버튼을 선택 상태로 설정
-        // updateBottomNavigationSelection(btnMyPageNav)
-
-
-        // 닉네임 설정 (임시)
-        // tvNickname.text = "윤다인"
-
-        // 레벨 텍스트 설정 (임시)
-        // updateLevelText(10) // 예시: Lv.10 동네 마스터
     }
+
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
@@ -196,13 +212,13 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
 
         spotsToDisplay.forEach { spot ->
             val markerOptions = MarkerOptions()
-                .position(spot.latLng)
+                .position(LatLng(spot.latitude, spot.longitude))
                 .title(spot.name)
-                .snippet(spot.category) // infoWindow에서 사용될 정보
+                .snippet(spot.categoryName ?: spot.categoryEnum?.name ?: "") // Enum or Custom String
                 .icon(BitmapDescriptorFactory.defaultMarker(getMarkerColorForFilter(currentFilterType)))
 
             val marker = googleMap.addMarker(markerOptions)
-            marker?.tag = spot // 마커에 Spot 객체 태그
+            marker?.tag = spot // 마커에 SpotEntity 태그
             marker?.let { currentMarkers.add(it) }
         }
 
@@ -231,8 +247,8 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 마커에서 Spot 객체 가져오기
-    private fun getSpotFromMarker(marker: Marker): Spot? {
-        return marker.tag as? Spot
+    private fun getSpotFromMarker(marker: Marker): SpotEntity? {
+        return marker.tag as? SpotEntity
     }
 
     // 레벨 텍스트 업데이트
@@ -250,7 +266,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
             10 -> "동네 마스터"
             else -> "미정 레벨"
         }
-        // tvLevelText.text = "LV.$level $levelName"
+        tvLevelText.text = "LV.$level $levelName"
         // TODO: 뱃지 이미지도 level에 따라 변경 로직 추가 (ImageView src 변경)
         // findViewById<ImageView>(R.id.ivLevelBadge).setImageResource(R.drawable.badge_master) // 현재는 고정
         // 예시: findViewById<ImageView>(R.id.ivLevelBadge).setImageResource(resources.getIdentifier("badge_level_$level", "drawable", packageName))
@@ -329,7 +345,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 커스텀 정보창 어댑터
-    class CustomInfoWindowAdapter(private val context: MyPageActivity, private val spot: Spot) : GoogleMap.InfoWindowAdapter {
+    class CustomInfoWindowAdapter(private val context: MyPageActivity, private val spot: SpotEntity) : GoogleMap.InfoWindowAdapter {
         override fun getInfoWindow(marker: Marker): android.view.View? {
             return null
         }
@@ -341,12 +357,19 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
 
             tvTitle.text = marker.title
             // 방문한 스팟인 경우 "방문완료" 추가
-            if (spot.visited) {
+            if (spot.isVisited) {
                 tvSnippet.text = "${marker.snippet}\n방문완료"
             } else {
                 tvSnippet.text = marker.snippet
             }
             return view
         }
+    }
+
+    private fun updateSpotsByType(spotList: List<SpotEntity>) {
+        registeredSpots = spotList.filter { it.isSaved }
+        likedSpots = spotList.filter { it.isLiked }
+        dislikedSpots = spotList.filter { it.isDisliked }
+        visitedSpots = spotList.filter { it.isVisited }
     }
 }

@@ -7,8 +7,11 @@ import com.example.mymaps.repository.SpotRepository
 import kotlinx.coroutines.launch
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
+import com.example.mymaps.model.SpotCategory
 
-class SpotViewModel(private val repository: SpotRepository): ViewModel() {
+class SpotViewModel(
+    private val repository: SpotRepository
+): ViewModel() {
     // XML UI에서 LiveData를 observe하면 값이 바뀔 때 자동으로 UI가 업데이트
     private val _allSpots = MutableLiveData<List<SpotEntity>>() // 내부 상태(수정 가능)
     val allSpots: LiveData<List<SpotEntity>> = _allSpots // 외부 공개(읽기 전용)
@@ -69,6 +72,20 @@ class SpotViewModel(private val repository: SpotRepository): ViewModel() {
     fun loadVisitedSpots() {
         viewModelScope.launch {
             _allSpots.value = repository.getVisitedSpots()
+        }
+    }
+
+    // 특정 Enum 카테고리별 조회
+    fun loadSpotsByEnum(categoryEnum: SpotCategory) {
+        viewModelScope.launch {
+            _allSpots.value = repository.getSpotsByCategoryEnum(categoryEnum)
+        }
+    }
+
+    // 커스텀 카테고리별 조회
+    fun loadSpotsByCustomCategory(categoryName: String) {
+        viewModelScope.launch {
+            _allSpots.value = repository.getSpotsByCustomCategory(categoryName)
         }
     }
 }

@@ -1,12 +1,15 @@
 package com.example.mymaps.repository
 
 import android.devicelock.DeviceId
+import com.example.mymaps.model.SpotCategory
 import com.example.mymaps.model.SpotDao
 import com.example.mymaps.model.SpotEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SpotRepository(private val spotDao: SpotDao) {
+class SpotRepository(
+    private val spotDao: SpotDao
+) {
 
     // 스팟 insert
     suspend fun insertSpot(spot: SpotEntity) {
@@ -62,5 +65,15 @@ class SpotRepository(private val spotDao: SpotDao) {
         return withContext(Dispatchers.IO) {
             spotDao.getVisitedSpots()
         }
+    }
+
+    // 특정 Enum 카테고리별 조회
+    suspend fun getSpotsByCategoryEnum(categoryEnum: SpotCategory): List<SpotEntity> = withContext(Dispatchers.IO) {
+        spotDao.getSpotsByCategoryEnum(categoryEnum)
+    }
+
+    // 커스텀 카테고리별 조회
+    suspend fun getSpotsByCustomCategory(categoryName: String): List<SpotEntity> = withContext(Dispatchers.IO) {
+        spotDao.getSpotsByCustomCategory(SpotCategory.ETC, categoryName)
     }
 }

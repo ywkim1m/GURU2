@@ -59,7 +59,8 @@ class SpotTestActivity : AppCompatActivity() {
                 name = "스팟 $randomId",
                 description = "예시",
                 photoUri = null,
-                category = SpotCategory.BENCH,
+                categoryName = null,
+                categoryEnum = SpotCategory.BENCH,
                 roadAddress = "도로명주소",
                 latitude = 0.0,
                 longitude = 0.0

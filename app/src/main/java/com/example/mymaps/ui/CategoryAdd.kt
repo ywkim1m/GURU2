@@ -1,4 +1,4 @@
-package com.example.mymaps
+package com.example.mymaps.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.mymaps.R
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 

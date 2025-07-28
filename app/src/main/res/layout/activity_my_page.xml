@@ -104,76 +104,27 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:background="@drawable/rounded_background_white"
         android:padding="16dp"
-        android:elevation="8dp"
-        android:gravity="center_vertical">
+        android:elevation="8dp">
 
+        <!-- (1) 닉네임 + 레벨 가로 한 줄 -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvNickname"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="윤다인"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />
-
-<!--            <HorizontalScrollView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:scrollbars="none"-->
-<!--                android:layout_marginTop="8dp">-->
-
-<!--                <LinearLayout-->
-<!--                    android:id="@+id/badgeContainer"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="horizontal"-->
-<!--                    android:paddingEnd="16dp">-->
-
-<!--                    <ImageView-->
-<!--                        android:layout_width="48dp"-->
-<!--                        android:layout_height="48dp"-->
-<!--                        android:src="@drawable/badge_level_1_background"-->
-<!--                        android:contentDescription="레벨 1 뱃지"-->
-<!--                        android:layout_marginEnd="8dp"/>-->
-<!--                    <ImageView-->
-<!--                        android:layout_width="48dp"-->
-<!--                        android:layout_height="48dp"-->
-<!--                        android:src="@drawable/badge_level_2"lv-->
-<!--                        android:contentDescription="레벨 2 뱃지"-->
-<!--                        android:layout_marginEnd="8dp"/>-->
-<!--                    <ImageView-->
-<!--                        android:layout_width="48dp"-->
-<!--                        android:layout_height="48dp"-->
-<!--                        android:src="@drawable/badge_level_10"-->
-<!--                        android:contentDescription="레벨 10 뱃지"-->
-<!--                        android:layout_marginEnd="8dp"/>-->
-<!--                </LinearLayout>-->
-<!--            </HorizontalScrollView>-->
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:layout_marginStart="16dp">
-
-<!--            <ImageView-->
-<!--                android:id="@+id/ivLevelBadge"-->
-<!--                android:layout_width="60dp"-->
-<!--                android:layout_height="60dp"-->
-<!--                android:src="@drawable/badge_master"-->
-<!--                android:contentDescription="현재 레벨 대표 뱃지" />-->
 
             <TextView
                 android:id="@+id/tvLevelText"
@@ -183,10 +134,32 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black"
-                android:layout_marginTop="4dp" />
+                android:layout_marginStart="16dp"/>
         </LinearLayout>
+
+        <!-- (2) 뱃지 줄! -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvBadges"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:overScrollMode="never"
+            android:clipToPadding="false"
+            android:scrollbars="none" />
     </LinearLayout>
 
+
+    <!-- 뱃지 리스트 RecyclerView (가로) -->
+    <!--<androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBadges"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_above="@id/bottomNavigationView"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:overScrollMode="never"
+        android:clipToPadding="false"/>-->
     <LinearLayout
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
@@ -197,31 +170,31 @@
         android:elevation="8dp"
         android:gravity="center_vertical">
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/btnHome"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="@android:color/transparent"-->
-<!--            android:src="@drawable/ic_home"-->
-<!--            android:contentDescription="홈"-->
-<!--            app:tint="@color/nav_icon_color_selector" /> <ImageButton-->
-<!--        android:id="@+id/btnAddSpotNav"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_weight="1"-->
-<!--        android:background="@android:color/transparent"-->
-<!--        android:src="@drawable/ic_add_spot"-->
-<!--        android:contentDescription="스팟 추가"-->
-<!--        app:tint="@color/nav_icon_color_selector" /> <ImageButton-->
-<!--        android:id="@+id/btnMyPageNav"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_weight="1"-->
-<!--        android:background="@android:color/transparent"-->
-<!--        android:src="@drawable/ic_my_page_selected"-->
-<!--        android:contentDescription="마이페이지"-->
-<!--        app:tint="@color/nav_icon_color_selector" /> -->
+        <!--        <ImageButton-->
+        <!--            android:id="@+id/btnHome"-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_weight="1"-->
+        <!--            android:background="@android:color/transparent"-->
+        <!--            android:src="@drawable/ic_home"-->
+        <!--            android:contentDescription="홈"-->
+        <!--            app:tint="@color/nav_icon_color_selector" /> <ImageButton-->
+        <!--        android:id="@+id/btnAddSpotNav"-->
+        <!--        android:layout_width="0dp"-->
+        <!--        android:layout_height="wrap_content"-->
+        <!--        android:layout_weight="1"-->
+        <!--        android:background="@android:color/transparent"-->
+        <!--        android:src="@drawable/ic_add_spot"-->
+        <!--        android:contentDescription="스팟 추가"-->
+        <!--        app:tint="@color/nav_icon_color_selector" /> <ImageButton-->
+        <!--        android:id="@+id/btnMyPageNav"-->
+        <!--        android:layout_width="0dp"-->
+        <!--        android:layout_height="wrap_content"-->
+        <!--        android:layout_weight="1"-->
+        <!--        android:background="@android:color/transparent"-->
+        <!--        android:src="@drawable/ic_my_page_selected"-->
+        <!--        android:contentDescription="마이페이지"-->
+        <!--        app:tint="@color/nav_icon_color_selector" /> -->
 
     </LinearLayout>
 </RelativeLayout>
