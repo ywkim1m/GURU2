@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -67,6 +69,7 @@ class CategoryAdd : AppCompatActivity() {
 
             setResult(RESULT_OK, resultIntent)
             Toast.makeText(this, "카테고리를 추가했습니다", Toast.LENGTH_SHORT).show()
+
             finish()
         }
     }

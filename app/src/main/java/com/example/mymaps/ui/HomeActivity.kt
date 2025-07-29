@@ -1,12 +1,16 @@
 package com.example.mymaps.ui
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ImageSpan
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -60,6 +64,31 @@ class HomeActivity : AppCompatActivity() {
 
         descText = findViewById(R.id.desc_text)
 
+        val emptyView = findViewById<LinearLayout>(R.id.emptyView)
+        val recyclerView = findViewById<RecyclerView>(R.id.rvImageCarousel)
+        val emptyImage = findViewById<ImageView>(R.id.emptyImage)
+        val descText = findViewById<TextView>(R.id.desc_text)
+
+        emptyImage.setColorFilter(Color.parseColor("#EEEEEE"), android.graphics.PorterDuff.Mode.SRC_IN)
+
+        spotViewModel.allSpots.observe(this) { spots ->
+            allSpotList = spots.filter { it.isSaved }
+            setCategoryChips(makeCategoryList(allSpotList))
+            applyCategoryFilter()
+            updateDescText()
+
+            // 스팟이 없으면 안내뷰만 보여주고, RecyclerView는 숨김
+            if (allSpotList.isEmpty()) {
+                emptyView.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+                descText.visibility = View.GONE
+            } else {
+                emptyView.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                descText.visibility = View.VISIBLE
+            }
+        }
+
         // 가로 스와이프, SnapHelper로 한 번에 한 카드
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerView.layoutManager = layoutManager
@@ -77,11 +106,12 @@ class HomeActivity : AppCompatActivity() {
         recyclerView.adapter = spotAdapter
 
         // ViewModel에서 데이터 받아서 어댑터에 넣음
-        spotViewModel.allSpots.observe(this) { spots ->
+        /*spotViewModel.allSpots.observe(this) { spots ->
             allSpotList = spots.filter { it.isSaved }
             setCategoryChips(makeCategoryList(allSpotList))
             applyCategoryFilter()
-        }
+            updateDescText()
+        }*/
 
         // 스크롤(카드 넘김) 시 현재 position 갱신
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -98,11 +128,25 @@ class HomeActivity : AppCompatActivity() {
         // 하단 좋아요/싫어요 버튼 동작
         goodImage.setOnClickListener {
             val spot = spotAdapter.currentList.getOrNull(currentPosition) ?: return@setOnClickListener
-            spotViewModel.updateSpot(spot.copy(isLiked = !spot.isLiked, isDisliked = false))
+            val updatedSpot = (spot.copy(isLiked = !spot.isLiked, isDisliked = false))
+
+            val mutableList = spotAdapter.currentList.toMutableList()
+            mutableList[currentPosition] = updatedSpot
+            spotAdapter.submitList(mutableList) // 변경 사항 즉시 반영
+
+            spotViewModel.updateSpot(updatedSpot) // DB 갱신
+            updateLikeDislikeButtons()
         }
         badImage.setOnClickListener {
             val spot = spotAdapter.currentList.getOrNull(currentPosition) ?: return@setOnClickListener
-            spotViewModel.updateSpot(spot.copy(isDisliked = !spot.isDisliked, isLiked = false))
+            val updatedSpot = spot.copy(isDisliked = !spot.isDisliked, isLiked = false)
+
+            val mutableList = spotAdapter.currentList.toMutableList()
+            mutableList[currentPosition] = updatedSpot
+            spotAdapter.submitList(mutableList)
+
+            spotViewModel.updateSpot(updatedSpot)
+            updateLikeDislikeButtons()
         }
 
         // 하단 네비게이션 바 버튼
@@ -162,7 +206,7 @@ class HomeActivity : AppCompatActivity() {
 
             // dot Drawable 불러와서 크기 설정
             val dot = ContextCompat.getDrawable(this, getDotDrawableRes(cat))!!
-            val dotSize = 40
+            val dotSize = 45
             dot.setBounds(0, 0, dotSize, dotSize)
             val span = ImageSpan(dot, ImageSpan.ALIGN_BOTTOM)
 
@@ -232,9 +276,14 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
-        spotAdapter.submitList(filtered)
-        currentPosition = 0
-
-        updateLikeDislikeButtons()
+        spotAdapter.submitList(filtered) {
+            currentPosition = 0
+            updateLikeDislikeButtons()
+            if (filtered.isEmpty()) {
+                descText.text = ""
+            } else {
+                updateDescText()
+            }
+        }
     }
 }

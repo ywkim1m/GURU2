@@ -3,6 +3,7 @@ package com.example.mymaps.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
@@ -120,14 +121,25 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
         // 뱃지
         val badgeList = userPrefs.badges.toMutableList()
 
-        // 기본 뱃지(level 1일 때)
-        if (userPrefs.userLevel == 1 && badgeList.isEmpty()) {
-            badgeList.add("badge_1")
-            userPrefs.badges = badgeList.toSet()
+        // 각 레벨별 뱃지를 자동으로 추가
+        for (level in 1..userPrefs.userLevel) {
+            val badgeId = "badge_$level"
+            if (!badgeList.contains(badgeId)) {
+                badgeList.add(badgeId)
+            }
+        }
+
+        // 저장(중복방지)
+        userPrefs.badges = badgeList.toSet()
+
+        // 뱃지 리스트를 레벨 기준 내림차순 정렬
+        val sortedBadgeList = badgeList.sortedByDescending {
+            // badge_3 → 3으로 변환해서 정렬
+            it.removePrefix("badge_").toIntOrNull() ?: 0
         }
 
         // RecyclerView 어댑터에 뱃지 적용
-        badgeAdapter = BadgeAdapter(badgeList.map { Badge(it) })
+        badgeAdapter = BadgeAdapter(sortedBadgeList.map { Badge(it) })
         val rvBadges = findViewById<RecyclerView>(R.id.rvBadges)
         rvBadges.adapter = badgeAdapter
         rvBadges.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)

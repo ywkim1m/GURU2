@@ -5,6 +5,7 @@
         <item name="android:statusBarColor">@android:color/white</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
         <item name="chipStyle">@style/AppChipStyle</item>
+ <!--       <item name="android:navigationBarColor">@color/white</item>-->
         <!-- 필요한 경우 아래 주석 해제
         <item name="colorPrimary">@color/my_light_primary</item>
         -->
