@@ -22,11 +22,15 @@ import com.example.mymaps.viewmodel.SpotViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import androidx.activity.viewModels
-import com.example.mymaps.CategoryAdd
+import com.example.mymaps.ui.CategoryAdd
 import com.example.mymaps.R
+import com.example.mymaps.MyApp
+import com.example.mymaps.viewmodel.SpotViewModelFactory
 
 class SpotEditActivity : AppCompatActivity() {
-    private val spotViewModel: SpotViewModel by viewModels()
+    private val spotViewModel: SpotViewModel by viewModels {
+        SpotViewModelFactory((application as MyApp).spotRepository)
+    }
 
     private lateinit var btnBack: ImageButton
     private lateinit var ivSpotImage: ImageView
@@ -69,17 +73,42 @@ class SpotEditActivity : AppCompatActivity() {
         btnAddCategory = findViewById(R.id.btnAddCategory)
         btnDeleteCategory = findViewById(R.id.btnDeleteCategory)
 
+        // 카테고리 단일 선택 옵션
+        chipGroupCategories.isSingleSelection = true
+
         setRequiredLabel(tvPlaceLabel, "장소명")
         setRequiredLabel(tvAddressLabel, "주소")
         setRequiredLabel(tvDescriptionLabel, "설명")
 
-        val latitude = intent.getDoubleExtra("latitude", 0.0)
-        val longitude = intent.getDoubleExtra("longitude", 0.0)
-        val placeName = intent.getStringExtra("placeName")
+        // intent로 spot 전달
+        val spot = intent.getParcelableExtra<SpotEntity>("spot")
+
+        // 기존 값 업데이트
+        spot?.let {
+            etPlaceName.setText(it.name)
+            etAddress.setText(it.roadAddress)
+            etSpotDescription.setText(it.description)
+            // 이미지
+            if (!it.photoUri.isNullOrEmpty()) {
+                ivSpotImage.setImageURI(Uri.parse(it.photoUri))
+                selectedImageUri = Uri.parse(it.photoUri)
+            }
+            // 카테고리 chip도 기존 값으로 set
+            if (it.categoryEnum != null) {
+                // 기본 카테고리 chip 자동 생성 및 체크
+                addCategoryChip(it.categoryEnum.displayName, it.categoryPinColorResId)
+            } else if (!it.categoryName.isNullOrBlank()) {
+                addCategoryChip(it.categoryName, it.categoryPinColorResId)
+            }
+        }
+
+        /*val placeName = intent.getStringExtra("placeName")
         val placeAddress = intent.getStringExtra("placeAddress")
+        val description = intent.getStringExtra("description")
 
         etPlaceName.setText(placeName)
         etAddress.setText(placeAddress)
+        etSpotDescription.setText(description)*/
 
         addCategoryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -113,25 +142,29 @@ class SpotEditActivity : AppCompatActivity() {
             val spotTitle = etPlaceName.text.toString()
             val spotDescription = etSpotDescription.text.toString()
             val spotAddress = etAddress.text.toString()
-            val latitude = intent.getDoubleExtra("latitude", 0.0)
-            val longitude = intent.getDoubleExtra("longitude", 0.0)
             val photoUri = selectedImageUri?.toString()
+            val latitude = spot?.latitude ?: 0.0
+            val longitude = spot?.longitude ?: 0.0
 
-            // 첫 번째 chip만 대표 카테고리로 저장 (여러개도 선택 가능하면 변경)
+            // 카테고리 정보는 chipGroupCategories로 동일
             var pickedCategoryPinColorResId = 0
-            var categoryStr = "ETC"
-            if (chipGroupCategories.childCount > 0) {
-                val firstChip = chipGroupCategories.getChildAt(0) as Chip
-                categoryStr = firstChip.text.toString()
-                pickedCategoryPinColorResId = firstChip.tag as? Int ?: 0
+            var categoryStr = "기타"
+            val checkedChipId = chipGroupCategories.checkedChipId
+            if (checkedChipId != View.NO_ID) {
+                val checkedChip = chipGroupCategories.findViewById<Chip>(checkedChipId)
+                categoryStr = checkedChip.text.toString()
+                pickedCategoryPinColorResId = checkedChip.tag as? Int ?: 0
             }
-            val (categoryEnum, customCategory) = try {
-                SpotCategory.valueOf(categoryStr) to null
-            } catch (e: Exception) {
+
+            val enumValue = SpotCategory.fromDisplayName(categoryStr)
+            val (categoryEnum, customCategory) = if (enumValue != null) {
+                enumValue to null
+            } else {
                 SpotCategory.ETC to categoryStr
             }
 
-            val spotEntity = SpotEntity(
+            // 기존 spot의 id를 그대로 사용해야 "수정"됨!
+            val updatedSpot = spot?.copy(
                 name = spotTitle,
                 description = spotDescription,
                 photoUri = photoUri,
@@ -144,9 +177,36 @@ class SpotEditActivity : AppCompatActivity() {
                 isSaved = true
             )
 
-            spotViewModel.insertSpot(spotEntity)
-            Toast.makeText(this, "스팟을 추가했어요", Toast.LENGTH_LONG).show()
-            finish()
+            if (updatedSpot != null) {
+                spotViewModel.updateSpot(updatedSpot)
+                Toast.makeText(this, "스팟을 수정했어요", Toast.LENGTH_LONG).show()
+                finish()
+            }
+        }
+
+        // 삭제 버튼
+        val btnDeleteSpot = findViewById<Button>(R.id.btnDeleteSpot)
+        btnDeleteSpot.setOnClickListener {
+            val dialogView = layoutInflater.inflate(R.layout.dialog_delete_spot, null)
+            val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .setBackgroundInsetStart(36)
+                .setBackgroundInsetEnd(36)
+                .create()
+
+            dialogView.findViewById<Button>(R.id.btnCancel).setOnClickListener {
+                dialog.dismiss()
+            }
+            dialogView.findViewById<Button>(R.id.btnDelete).setOnClickListener {
+                spot?.let {
+                    spotViewModel.deleteSpot(it)
+                    Toast.makeText(this, "스팟이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                    finish()
+                }
+            }
+            dialog.show()
+
         }
 
         // 카테고리 추가

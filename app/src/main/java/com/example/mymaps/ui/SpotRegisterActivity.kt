@@ -14,6 +14,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.mymaps.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -22,6 +23,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class SpotRegisterActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -141,50 +144,49 @@ class SpotRegisterActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun updatePlaceInfo(lat: Double, lng: Double) {
-        runOnUiThread {
-            tvPlaceAddress.text = "주소 검색 중..."
-            tvPlaceName.text = "장소명 검색 중..."
-        }
+        tvPlaceAddress.text = "주소 검색 중..."
+        tvPlaceName.text = "장소명 검색 중..."
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val geoCoder = Geocoder(this@SpotRegisterActivity, Locale.KOREA)
+                val addresses = geoCoder.getFromLocation(lat, lng, 1)
 
-        try {
-            val geoCoder = Geocoder(this, Locale.KOREA)
-            val addresses = geoCoder.getFromLocation(lat, lng, 1)
+                if (addresses != null && addresses.isNotEmpty()) {
+                    val address = addresses[0]
+                    val fullAddress = address.getAddressLine(0) ?: "주소 없음"
+                    runOnUiThread { tvPlaceAddress.text = fullAddress }
+                    Log.d("SpotRegister", "Geocoder 검색된 주소: $fullAddress")
 
-            if (addresses != null && addresses.isNotEmpty()) {
-                val address = addresses[0]
-                val fullAddress = address.getAddressLine(0) ?: "주소 없음"
-                runOnUiThread { tvPlaceAddress.text = fullAddress }
-                Log.d("SpotRegister", "Geocoder 검색된 주소: $fullAddress")
+                    val thoroughfare = address.thoroughfare
+                    val premises = address.premises
+                    val featureName = address.featureName
+                    val subLocality = address.subLocality
 
-                val thoroughfare = address.thoroughfare
-                val premises = address.premises
-                val featureName = address.featureName
-                val subLocality = address.subLocality
+                    Log.d("SpotRegister", "Geocoder 상세: thoroughfare='$thoroughfare', premises='$premises', featureName='$featureName', subLocality='$subLocality'")
 
-                Log.d("SpotRegister", "Geocoder 상세: thoroughfare='$thoroughfare', premises='$premises', featureName='$featureName', subLocality='$subLocality'")
-
-                val geocoderPlaceName = when {
-                    !premises.isNullOrEmpty() -> premises
-                    !thoroughfare.isNullOrEmpty() -> thoroughfare
-                    !subLocality.isNullOrEmpty() -> subLocality
-                    !featureName.isNullOrEmpty() && featureName != fullAddress.split(" ").lastOrNull() -> featureName
-                    else -> "장소명 없음 (Geocoder)"
+                    val geocoderPlaceName = when {
+                        !premises.isNullOrEmpty() -> premises
+                        !thoroughfare.isNullOrEmpty() -> thoroughfare
+                        !subLocality.isNullOrEmpty() -> subLocality
+                        !featureName.isNullOrEmpty() && featureName != fullAddress.split(" ").lastOrNull() -> featureName
+                        else -> "장소명 없음 (Geocoder)"
+                    }
+                    runOnUiThread { tvPlaceName.text = geocoderPlaceName }
+                    Log.d("SpotRegister", "장소명 최종 설정 (Geocoder): $geocoderPlaceName")
+                } else {
+                    runOnUiThread {
+                        tvPlaceAddress.text = "주소 없음"
+                        tvPlaceName.text = "장소명 없음 (Geocoder)"
+                    }
+                    Log.d("SpotRegister", "Geocoder 결과 없음: 주소, 장소명 없음")
                 }
-                runOnUiThread { tvPlaceName.text = geocoderPlaceName }
-                Log.d("SpotRegister", "장소명 최종 설정 (Geocoder): $geocoderPlaceName")
-            } else {
+            } catch (e: Exception) {
                 runOnUiThread {
-                    tvPlaceAddress.text = "주소 없음"
-                    tvPlaceName.text = "장소명 없음 (Geocoder)"
+                    tvPlaceAddress.text = "주소 오류"
+                    tvPlaceName.text = "장소명 오류 (Geocoder)"
                 }
-                Log.d("SpotRegister", "Geocoder 결과 없음: 주소, 장소명 없음")
+                Log.e("SpotRegister", "Geocoder 오류 발생: ${e.message}", e)
             }
-        } catch (e: Exception) {
-            runOnUiThread {
-                tvPlaceAddress.text = "주소 오류"
-                tvPlaceName.text = "장소명 오류 (Geocoder)"
-            }
-            Log.e("SpotRegister", "Geocoder 오류 발생: ${e.message}", e)
         }
     }
 }

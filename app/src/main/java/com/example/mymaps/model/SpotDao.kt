@@ -1,5 +1,6 @@
 package com.example.mymaps.model
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
@@ -18,33 +19,33 @@ interface SpotDao {
 
     // 모든 스팟 불러오기
     @Query("SELECT * FROM spots")
-    suspend fun getAllSpots(): List<SpotEntity>
+    fun getAllSpots(): LiveData<List<SpotEntity>>
 
     // 특정 enum 카테고리의 스팟
     @Query("SELECT * FROM spots WHERE categoryEnum = :categoryEnum")
-    suspend fun getSpotsByCategoryEnum(categoryEnum: SpotCategory): List<SpotEntity>
+    fun getSpotsByCategoryEnum(categoryEnum: SpotCategory): LiveData<List<SpotEntity>>
 
     // 커스텀(직접입력) 카테고리의 스팟
     @Query("SELECT * FROM spots WHERE categoryEnum = :etcEnum AND categoryName = :categoryName")
-    suspend fun getSpotsByCustomCategory(etcEnum: SpotCategory = SpotCategory.ETC, categoryName: String): List<SpotEntity>
+    fun getSpotsByCustomCategory(etcEnum: SpotCategory = SpotCategory.ETC, categoryName: String): LiveData<List<SpotEntity>>
 
     // 저장한 스팟 불러오기
     @Query("SELECT * FROM spots WHERE isSaved = 1")
-    suspend fun getSavedSpots(): List<SpotEntity>
+    fun getSavedSpots(): LiveData<List<SpotEntity>>
 
     // '좋아요'한 스팟 불러오기
     @Query("SELECT * FROM spots WHERE isLiked = 1")
-    suspend fun  getLikedSpots(): List<SpotEntity>
+    fun  getLikedSpots(): LiveData<List<SpotEntity>>
 
     // '싫어요'한 스팟 불러오기
     @Query("SELECT * FROM spots WHERE isDisliked = 1")
-    suspend fun  getDislikedSpots(): List<SpotEntity>
+    fun  getDislikedSpots(): LiveData<List<SpotEntity>>
 
     // 방문한 스팟 불러오기
     @Query("SELECT * FROM spots WHERE isVisited = 1")
-    suspend fun getVisitedSpots(): List<SpotEntity>
+    fun getVisitedSpots(): LiveData<List<SpotEntity>>
 
     // 스팟 방문 시
     @Query("UPDATE spots SET isVisited = 1 WHERE id = :spotId")
-    suspend fun markSpotAsVisited(spotId: Int)
+    fun markSpotAsVisited(spotId: Int)
 }

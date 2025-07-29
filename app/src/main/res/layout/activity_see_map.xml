@@ -80,7 +80,7 @@
             android:orientation="horizontal"
             android:gravity="center">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnClose"
                 style="@style/Widget.AppCompat.Button"
                 android:layout_width="0dp"
@@ -92,7 +92,7 @@
                 android:background="@drawable/bg_button_gray"
                 android:layout_marginEnd="8dp"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnCertify"
                 style="@style/Widget.AppCompat.Button"
                 android:layout_width="0dp"

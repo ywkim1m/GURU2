@@ -20,8 +20,8 @@ class UserPrefsManager(context: Context) {
         get() = prefs.getStringSet("badges_unlocked", emptySet()) ?: emptySet()
         set(value) { prefs.edit().putStringSet("badges_unlocked", value).apply() }
 
-    /*// 뱃지 추가
-    fun addBadge(badgeId: String) {
+    // 뱃지 추가
+    fun add(badgeId: String) {
         badges = badges + badgeId
-    }*/
+    }
 }

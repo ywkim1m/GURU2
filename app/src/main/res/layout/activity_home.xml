@@ -33,94 +33,27 @@
             android:layout_weight="1"/>
     </LinearLayout>
 
-    <!-- 카테고리 바 (네 칩 모두 표시, 좌우 여백/배경 동일) -->
-    <LinearLayout
-        android:id="@+id/category_section"
-        android:layout_width="wrap_content"
+
+    <!-- 카테고리 바 -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
+        android:scrollbars="none"
+        android:paddingEnd="30dp"
+        android:clipToPadding="false">
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupCategory"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="@drawable/cr24b1b1b1b"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="16dp"
-            android:layout_marginEnd="6dp"
-            android:orientation="horizontal">
-            <LinearLayout
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:background="@drawable/cr12bf14a41"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="산책루트"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal"
+            app:singleSelection="true"
+            app:chipSpacingHorizontal="8dp"/>
+    </HorizontalScrollView>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="@drawable/se0e0e0sw1cr24"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="16dp"
-            android:layout_marginEnd="6dp"
-            android:orientation="horizontal">
-            <LinearLayout
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:background="@drawable/cr12bff763c"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="숨은맛집"
-                android:textColor="#3F3F3F"
-                android:textSize="14sp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="@drawable/se0e0e0sw1cr24"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="16dp"
-            android:layout_marginEnd="6dp"
-            android:orientation="horizontal">
-            <LinearLayout
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:background="@drawable/cr12bffc400"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="포토존"
-                android:textColor="#3F3F3F"
-                android:textSize="14sp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="@drawable/se0e0e0sw1cr24"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="16dp"
-            android:orientation="horizontal">
-            <LinearLayout
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:background="@drawable/cr12b34c759"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="벤치"
-                android:textColor="#3F3F3F"
-                android:textSize="14sp"/>
-        </LinearLayout>
-    </LinearLayout>
 
     <!-- 여기부터 스크롤(이미지뷰+텍스트) -->
     <ScrollView
@@ -172,7 +105,7 @@
                 android:layout_marginBottom="20dp"
                 android:textColor="#3F3F3F"
                 android:textSize="16sp"
-                android:text="무거운 물품이 있는 경우 장보기용 카트를 대여해주는 곳! 계단을 올라가서 오른쪽으로 꺽으면 ‘마타줌’이라는 깃발이 보인다. 길어지면 스크롤됩니다."/>
+                android:text="스팟을 추가해 주세요!"/>
         </LinearLayout>
     </ScrollView>
 
@@ -225,10 +158,10 @@
     <LinearLayout
         android:id="@+id/nav_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="72dp"
         android:orientation="horizontal"
-        android:background="#FFFFFF"
-        android:paddingVertical="12dp"
+        android:background="@drawable/nav_bar_bg"
+        android:paddingVertical="0dp"
         android:gravity="center"
         android:clipChildren="false"
         android:clipToPadding="false">
@@ -266,7 +199,8 @@
         android:id="@+id/bottom_space"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="16dp"
+        android:background="#EEEEEE"
         android:layout_marginTop="0dp"
-        android:background="#EEEEEE"/>
+        android:paddingTop="0dp"/>
 </LinearLayout>

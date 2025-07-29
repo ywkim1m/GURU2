@@ -19,15 +19,21 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.view.Gravity
 import android.view.View
 import android.net.Uri
+import android.util.Log
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.viewModels
 import com.example.mymaps.R
 import com.example.mymaps.model.SpotCategory
 import com.example.mymaps.model.SpotEntity
 import com.example.mymaps.viewmodel.SpotViewModel
+import com.example.mymaps.MyApp
+import com.example.mymaps.viewmodel.SpotViewModelFactory
+import java.io.File
 
 class SpotDetailActivity : AppCompatActivity() {
-    private val spotViewModel: SpotViewModel by viewModels()
+    private val spotViewModel: SpotViewModel by viewModels {
+        SpotViewModelFactory((application as MyApp).spotRepository)
+    }
 
     private lateinit var btnBack: ImageButton
     private lateinit var ivSpotImage: ImageView
@@ -70,6 +76,9 @@ class SpotDetailActivity : AppCompatActivity() {
         btnAddCategory = findViewById(R.id.btnAddCategory)
         btnDeleteCategory = findViewById(R.id.btnDeleteCategory)
 
+        // 카테고리 단일 선택 옵션
+        chipGroupCategories.isSingleSelection = true
+
         setRequiredLabel(tvPlaceLabel, "장소명")
         setRequiredLabel(tvAddressLabel, "주소")
         setRequiredLabel(tvDescriptionLabel, "설명")
@@ -97,10 +106,18 @@ class SpotDetailActivity : AppCompatActivity() {
 
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
             if (uri != null) {
-                ivSpotImage.setImageURI(uri)
-                selectedImageUri = uri
+                // 이미지 내부저장소로 복사
+                val savedPath = copyUriToInternal(uri)
+                if (savedPath != null) {
+                    selectedImageUri = Uri.fromFile(File(savedPath))
+                    ivSpotImage.setImageURI(selectedImageUri)
+                } else {
+                    selectedImageUri = uri // 복사 실패 시 원본 uri 유지
+                    ivSpotImage.setImageURI(uri)
+                }
             }
         }
+
 
 
         // 뒤로가기 버튼 클릭 리스너
@@ -123,22 +140,26 @@ class SpotDetailActivity : AppCompatActivity() {
             val longitude = intent.getDoubleExtra("longitude", 0.0) // 경도
             val photoUri = selectedImageUri?.toString() // 장소 사진
 
-            // 카테고리 추출
             var pickedCategoryPinColorResId = 0
-            val allCategories = mutableListOf<String>()
-            var categoryStr = "ETC"
-            if (chipGroupCategories.childCount > 0) {
-                val firstChip = chipGroupCategories.getChildAt(0) as Chip
-                allCategories.add(firstChip.text.toString())
-                categoryStr = firstChip.text.toString()
+            var categoryStr = "기타"
 
-                pickedCategoryPinColorResId = firstChip.tag as? Int ?: 0
+            // ChipGroup에서 선택된(checked) Chip을 가져옴
+            val checkedChipId = chipGroupCategories.checkedChipId
+            if (checkedChipId != View.NO_ID) {
+                val checkedChip = chipGroupCategories.findViewById<Chip>(checkedChipId)
+                categoryStr = checkedChip.text.toString()
+                pickedCategoryPinColorResId = checkedChip.tag as? Int ?: 0
+            } else {
+                categoryStr = "기타"
+                pickedCategoryPinColorResId = 0
             }
+
             val (categoryEnum, customCategory) = try {
                 SpotCategory.valueOf(categoryStr) to null
             } catch (e: Exception) {
                 SpotCategory.ETC to categoryStr
             }
+
 
             val spotEntity = SpotEntity(
                 name = spotTitle,
@@ -150,11 +171,12 @@ class SpotDetailActivity : AppCompatActivity() {
                 roadAddress = spotAddress,
                 latitude = latitude,
                 longitude = longitude,
-                isSaved = true
+                isSaved = true,
+                visitedAt = null
             )
 
-
             spotViewModel.insertSpot(spotEntity)
+            Log.d("SpotEntityInsert", "photoUri=$photoUri, name=$spotTitle, ...")
             Toast.makeText(this, "스팟을 추가했어요", Toast.LENGTH_LONG).show()
             finish()
         }
@@ -222,4 +244,19 @@ class SpotDetailActivity : AppCompatActivity() {
         layoutParams.marginEnd = resources.getDimensionPixelSize(R.dimen.chip_horizontal_margin)
         chipGroupCategories.addView(chip, layoutParams)
     }
+
+    fun copyUriToInternal(uri: Uri): String? {
+        try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return null
+            val file = File(filesDir, "spot_image_${System.currentTimeMillis()}.jpg")
+            file.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+            return file.absolutePath // 절대경로 리턴
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
 }

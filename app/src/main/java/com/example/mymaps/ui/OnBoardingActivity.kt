@@ -1,5 +1,6 @@
 package com.example.mymaps.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mymaps.R
@@ -7,11 +8,22 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
+import com.example.mymaps.data.UserPrefsManager
 
 
 class OnBoardingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // prefs에 값 있는지 확인
+        val userPrefs = UserPrefsManager(this)
+        if (!userPrefs.userName.isNullOrBlank()) {
+            // 이미 이름 있으면 온보딩 X
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_on_boarding)
 
         val editTextName = findViewById<EditText>(R.id.etName)
@@ -28,7 +40,11 @@ class OnBoardingActivity : AppCompatActivity() {
 
         btnStart.setOnClickListener {
             val name = editTextName.text.toString()
-            // name 저장 후 화면 이동
+            if (name.isNotEmpty()) {
+                userPrefs.userName = name
+                startActivity(Intent(this, HomeActivity::class.java))
+                finish()
+            }
         }
     }
 }

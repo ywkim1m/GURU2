@@ -7,6 +7,7 @@ import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -16,8 +17,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mymaps.MyApp
 import com.example.mymaps.R
 import com.example.mymaps.adapter.BadgeAdapter
+import com.example.mymaps.data.UserPrefsManager
+import com.example.mymaps.model.Badge
 import com.example.mymaps.model.SpotEntity
 import com.example.mymaps.viewmodel.BadgeViewModel
 import com.example.mymaps.viewmodel.MyPageViewModel
@@ -34,11 +38,14 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.*
+import com.example.mymaps.viewmodel.SpotViewModelFactory
 
 class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
-    private val spotViewModel: SpotViewModel by viewModels()
+    private val spotViewModel: SpotViewModel by viewModels {
+        SpotViewModelFactory((application as MyApp).spotRepository)
+    }
     private val myPageViewModel: MyPageViewModel by viewModels()
-    private val badgeViewModel: BadgeViewModel by viewModels()
+
     private lateinit var badgeAdapter: BadgeAdapter
 
     private lateinit var googleMap: GoogleMap
@@ -46,7 +53,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var btnMyLocationCustom: ImageButton
     // private lateinit var tvNickname: TextView
-    private lateinit var tvLevelText: TextView
+//    private lateinit var tvLevelText: TextView
 
     // 핀 필터링 TextViews
     private lateinit var tvFilterRegistered: TextView
@@ -102,30 +109,40 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_page)
 
+        // 유저 데이터
+        val userPrefs = UserPrefsManager(this)
+        findViewById<TextView>(R.id.tvNickname).text = userPrefs.userName ?: "익명"
+
+        // 레벨
+        val level = userPrefs.userLevel
+        findViewById<TextView>(R.id.tvLevelText).text = "LV.$level ${getLevelName(level)}"
+
+        // 뱃지
+        val badgeList = userPrefs.badges.toMutableList()
+
+        // 기본 뱃지(level 1일 때)
+        if (userPrefs.userLevel == 1 && badgeList.isEmpty()) {
+            badgeList.add("badge_1")
+            userPrefs.badges = badgeList.toSet()
+        }
+
+        // RecyclerView 어댑터에 뱃지 적용
+        badgeAdapter = BadgeAdapter(badgeList.map { Badge(it) })
+        val rvBadges = findViewById<RecyclerView>(R.id.rvBadges)
+        rvBadges.adapter = badgeAdapter
+        rvBadges.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // View 초기화
         btnMyLocationCustom = findViewById(R.id.btnMyLocationCustom)
-        // tvNickname = findViewById(R.id.tvNickname)
-        tvLevelText = findViewById(R.id.tvLevelText)
 
-        // 뱃지 리스트 추가
-        // BadgeAdapter 생성
-        badgeAdapter = BadgeAdapter(emptyList())
-        // RecyclerView 연결
-        val rvBadges = findViewById<RecyclerView>(R.id.rvBadges)
-        rvBadges.adapter = badgeAdapter
-        rvBadges.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        // 뷰모델에서 뱃지 LiveData observe
-        badgeViewModel.badges.observe(this) { badges ->
-            badgeAdapter.updateList(badges)
-        }
 
-        // MyPageViewModel에서 LiveData로 userPrefs에 저장된 값 반영
+        /*// MyPageViewModel에서 LiveData로 userPrefs에 저장된 값 반영
         myPageViewModel.userLevel.observe(this) { level ->
             updateLevelText(level)
         }
-        myPageViewModel.loadUserData()
+        myPageViewModel.loadUserData()*/
 
         tvFilterRegistered = findViewById(R.id.tvFilterRegistered)
         tvFilterLiked = findViewById(R.id.tvFilterLiked)
@@ -137,7 +154,6 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
             updateSpotsByType(spotList)
             displayMarkersForCurrentFilter()
         }
-        spotViewModel.loadSpots()
 
         // Map 초기화
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
@@ -145,6 +161,29 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 필터 버튼 클릭 리스너 설정
         setupFilterButtons()
+
+        // 하단 네비게이션 바 버튼
+        val barOne = findViewById<ImageView>(R.id.bar_one)
+        val barTwo = findViewById<ImageView>(R.id.bar_two)
+        val barThree = findViewById<ImageView>(R.id.bar_three)
+
+        barOne.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            startActivity(intent)
+            finish()
+        }
+
+        // 스팟 등록 화면으로 전환
+        barTwo.setOnClickListener {
+            val intent = Intent(this, SpotRegisterActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 마이페이지로 전환
+        barThree.setOnClickListener {
+            // 현재 페이지, 동작x
+        }
     }
 
 
@@ -214,7 +253,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
             val markerOptions = MarkerOptions()
                 .position(LatLng(spot.latitude, spot.longitude))
                 .title(spot.name)
-                .snippet(spot.categoryName ?: spot.categoryEnum?.name ?: "") // Enum or Custom String
+                .snippet(spot.categoryName ?: spot.categoryEnum?.displayName ?: "") // Enum or Custom String
                 .icon(BitmapDescriptorFactory.defaultMarker(getMarkerColorForFilter(currentFilterType)))
 
             val marker = googleMap.addMarker(markerOptions)
@@ -252,24 +291,18 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 레벨 텍스트 업데이트
-    private fun updateLevelText(level: Int) {
-        val levelName = when (level) {
-            1 -> "동네 탐험가"
-            2 -> "동네 초보"
-            3 -> "동네 나그네"
-            4 -> "동네 일반인"
-            5 -> "동네 고수"
-            6 -> "동네 전문가"
-            7 -> "동네 지킴이"
-            8 -> "동네 전설"
-            9 -> "동네 영웅"
-            10 -> "동네 마스터"
-            else -> "미정 레벨"
-        }
-        tvLevelText.text = "LV.$level $levelName"
-        // TODO: 뱃지 이미지도 level에 따라 변경 로직 추가 (ImageView src 변경)
-        // findViewById<ImageView>(R.id.ivLevelBadge).setImageResource(R.drawable.badge_master) // 현재는 고정
-        // 예시: findViewById<ImageView>(R.id.ivLevelBadge).setImageResource(resources.getIdentifier("badge_level_$level", "drawable", packageName))
+    private fun getLevelName(level: Int): String = when (level) {
+        1 -> "동네 초심자"
+        2 -> "길찾기 연습생"
+        3 -> "견습 도깨비 사냥꾼"
+        4 -> "스팟 탐색가"
+        5 -> "동네 정보통"
+        6 -> "골목 달인"
+        7 -> "핫플 개척자"
+        8 -> "로컬 히어로"
+        9 -> "전설의 도깨비"
+        10 -> "동네 마스터"
+        else -> "미정 레벨"
     }
 
     private fun checkLocationPermissionForCustomButton() {
@@ -311,38 +344,7 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    // 하단 네비게이션 바 버튼 클릭 리스너 설정
-    private fun setupBottomNavigationButtons() {
-        /*
-        // val navButtons = listOf(btnHome, btnAddSpotNav, btnMyPageNav)
 
-        // btnHome.setOnClickListener {
-        //     updateBottomNavigationSelection(btnHome)
-        //     Toast.makeText(this, "홈 화면으로 이동 (구현 예정)", Toast.LENGTH_SHORT).show()
-        // }
-
-        // btnAddSpotNav.setOnClickListener {
-        //     updateBottomNavigationSelection(btnAddSpotNav)
-        //     val intent = Intent(this, SpotRegisterActivity::class.java)
-        //     startActivity(intent)
-        // }
-
-        // btnMyPageNav.setOnClickListener {
-        //     updateBottomNavigationSelection(btnMyPageNav)
-        //     Toast.makeText(this, "현재 마이페이지 입니다", Toast.LENGTH_SHORT).show()
-        // }
-        */
-    }
-
-    // 네비게이션 바 아이콘 선택 상태 업데이트
-    private fun updateBottomNavigationSelection(selectedButton: ImageButton) {
-        /*
-        // val navButtons = listOf(btnHome, btnAddSpotNav, btnMyPageNav)
-        // navButtons.forEach { button ->
-        //     button.isSelected = (button == selectedButton)
-        // }
-        */
-    }
 
     // 커스텀 정보창 어댑터
     class CustomInfoWindowAdapter(private val context: MyPageActivity, private val spot: SpotEntity) : GoogleMap.InfoWindowAdapter {

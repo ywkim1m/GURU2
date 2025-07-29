@@ -6,7 +6,8 @@
     android:id="@+id/SpotRegist"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SpotDetailActivity">
+    tools:context=".ui.SpotDetailActivity"
+    android:background="#FFFFFF">
 
     <ScrollView
         android:id="@+id/scrollView"

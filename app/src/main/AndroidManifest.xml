@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -18,38 +19,7 @@
         android:theme="@style/Theme.MyMaps"
         tools:targetApi="31">
         <activity
-            android:name=".ui.SpotEditActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.VisitedActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.SeeMapActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.HomeActivity"
-            android:exported="false" />
-        <!--
-        <activity
             android:name=".ui.OnBoardingActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        -->
-        <!--
-<activity
-            android:name=".MapsActivity"
-            android:exported="true"
-            android:label="@string/title_activity_maps">
-        </activity>
-        -->
-        <!-- SpotRegisterActivity를 런처 -->
-        <activity
-            android:name=".SpotRegisterActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -58,11 +28,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".SpotDetailActivity"
+            android:name=".ui.HomeActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ui.SeeMapActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ui.VisitedActivity"
             android:exported="false" />
         <activity
-            android:name=".CategoryAdd"
+            android:name=".ui.SpotEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.SpotRegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.SpotDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.CategoryAdd"
+            android:exported="false" />
+        <activity
+            android:name=".ui.MyPageActivity"
             android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.

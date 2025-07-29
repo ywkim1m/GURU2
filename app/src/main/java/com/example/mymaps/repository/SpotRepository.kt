@@ -1,6 +1,7 @@
 package com.example.mymaps.repository
 
 import android.devicelock.DeviceId
+import androidx.lifecycle.LiveData
 import com.example.mymaps.model.SpotCategory
 import com.example.mymaps.model.SpotDao
 import com.example.mymaps.model.SpotEntity
@@ -33,47 +34,33 @@ class SpotRepository(
     }
 
     // 모든 스팟 불러오기
-    suspend fun getAllSpots(): List<SpotEntity> {
-        return withContext(Dispatchers.IO) {
-            spotDao.getAllSpots()
-        }
+    fun getAllSpots(): LiveData<List<SpotEntity>> {
+        return spotDao.getAllSpots()
     }
 
     // 저장한 스팟 불러오기
-    suspend fun getSavedSpots(): List<SpotEntity> {
-        return withContext(Dispatchers.IO) {
-            spotDao.getSavedSpots()
-        }
+    fun getSavedSpots(): LiveData<List<SpotEntity>> {
+        return spotDao.getSavedSpots()
     }
 
     // '좋아요'한 스팟 불러오기
-    suspend fun getLikedSpots(): List<SpotEntity> {
-        return withContext(Dispatchers.IO) {
-            spotDao.getLikedSpots()
-        }
+    fun getLikedSpots(): LiveData<List<SpotEntity>> {
+        return spotDao.getLikedSpots()
     }
 
     // '싫어요'한 스팟 불러오기
-    suspend fun getDislikedSpots(): List<SpotEntity> {
-        return withContext(Dispatchers.IO) {
-            spotDao.getDislikedSpots()
-        }
+    fun getDislikedSpots(): LiveData<List<SpotEntity>> {
+        return spotDao.getDislikedSpots()
     }
 
     // 방문한 스팟 불러오기
-    suspend fun getVisitedSpots(): List<SpotEntity> {
-        return withContext(Dispatchers.IO) {
-            spotDao.getVisitedSpots()
-        }
+    fun getVisitedSpots(): LiveData<List<SpotEntity>> {
+        return spotDao.getVisitedSpots()
     }
 
     // 특정 Enum 카테고리별 조회
-    suspend fun getSpotsByCategoryEnum(categoryEnum: SpotCategory): List<SpotEntity> = withContext(Dispatchers.IO) {
-        spotDao.getSpotsByCategoryEnum(categoryEnum)
-    }
+    fun getSpotsByCategoryEnum(categoryEnum: SpotCategory): LiveData<List<SpotEntity>> = spotDao.getSpotsByCategoryEnum(categoryEnum)
 
     // 커스텀 카테고리별 조회
-    suspend fun getSpotsByCustomCategory(categoryName: String): List<SpotEntity> = withContext(Dispatchers.IO) {
-        spotDao.getSpotsByCustomCategory(SpotCategory.ETC, categoryName)
-    }
+    fun getSpotsByCustomCategory(categoryName: String): LiveData<List<SpotEntity>> = spotDao.getSpotsByCustomCategory(SpotCategory.ETC, categoryName)
 }
