@@ -21,10 +21,4 @@ class MyPageViewModel(private val prefs: UserPrefsManager) : ViewModel() {
         _userLevel.value = prefs.userLevel
         _badges.value = prefs.badges
     }
-
-    /*// 뱃지 추가
-    fun addBadge(badgeId: String) {
-        prefs.addBadge(badgeId)
-        _badges.value = prefs.badges
-    }*/
 }

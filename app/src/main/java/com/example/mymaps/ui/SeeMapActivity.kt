@@ -14,8 +14,11 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.mymaps.R
 import com.example.mymaps.data.UserPrefsManager
 import com.example.mymaps.model.SpotEntity
@@ -47,6 +50,8 @@ class SeeMapActivity : AppCompatActivity(), OnMapReadyCallback {
     // 스팟 위치(기본)
     private var targetLat = 0.0
     private var targetLng = 0.0
+
+    private lateinit var btnMyLocationCustom: ImageButton
 
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,6 +93,10 @@ class SeeMapActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
 
+        // 현재 위치 버튼
+        btnMyLocationCustom = findViewById(R.id.btnMyLocationCustom)
+
+
         // 바텀시트 버튼
         val closeBtn = findViewById<Button>(R.id.btnClose)
         val certifyBtn = findViewById<Button>(R.id.btnCertify)
@@ -114,7 +123,7 @@ class SeeMapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (!isGpsConfirmed) {
                 if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                    // ⭐ 여기서부터 즉시 위치 요청!
+                    // 여기서부터 즉시 위치 요청
                     val locationRequest = com.google.android.gms.location.LocationRequest.create().apply {
                         priority = com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
                         interval = 1000 // 1초
@@ -125,9 +134,6 @@ class SeeMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
                             val location = locationResult.lastLocation
                             if (location != null) {
-                                // 위치 좌표 토스트로 확인!
-                                Toast.makeText(this@SeeMapActivity, "현재 위치: ${location.latitude}, ${location.longitude}", Toast.LENGTH_SHORT).show()
-
                                 val distance = FloatArray(1)
                                 Location.distanceBetween(
                                     location.latitude, location.longitude,
@@ -170,7 +176,7 @@ class SeeMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
 
-                    // 위치 업데이트 요청 시작!
+                    // 위치 업데이트 요청 시작
                     fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
 
                 } else {
@@ -193,5 +199,59 @@ class SeeMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 .position(LatLng(targetLat, targetLng))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         )
+
+        // 커스텀 '내 위치' 버튼 클릭 리스너
+        btnMyLocationCustom.setOnClickListener {
+            checkLocationPermissionForCustomButton()
+        }
+    }
+
+    // 위치 권한 요청
+    private val requestPermissionLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                moveToMyLocation()
+            } else {
+                Toast.makeText(this, "위치 권한이 거부되어 내 위치를 표시할 수 없습니다.", Toast.LENGTH_LONG).show()
+            }
+        }
+
+    private fun checkLocationPermissionForCustomButton() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                moveToMyLocation()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                Toast.makeText(this, "내 위치를 표시하려면 위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            else -> {
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+    }
+
+    private fun moveToMyLocation() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            googleMap.isMyLocationEnabled = true
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val currentLocation = LatLng(location.latitude, location.longitude)
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17f))
+                } else {
+                    Toast.makeText(this, "현재 위치를 가져올 수 없습니다. 에뮬레이터 위치를 설정해주세요.", Toast.LENGTH_SHORT).show()
+                }
+            }.addOnFailureListener { e ->
+                Toast.makeText(this, "위치 정보를 가져오는 데 실패했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("MyPageActivity", "위치 정보 가져오기 실패", e)
+            }
+        }
     }
 }

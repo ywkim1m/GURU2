@@ -75,23 +75,6 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
     // 공릉동 도깨비시장 좌표 (초기 지도 위치)
     private val GONGNEUNG_DOKKAEBI_MARKET = LatLng(37.6256, 127.0782)
 
-    /*// 임시 데이터 클래스
-    data class Spot(val id: String, val name: String, val latLng: LatLng, val category: String, val visited: Boolean = false)
-
-    // 임시 스팟 데이터 (실제 DB 연동 시 이 부분 대체)
-    private val registeredSpots = mutableListOf<Spot>()
-    private val likedSpots = listOf(
-        Spot("L1", "좋아요 맛집 A", LatLng(37.6270, 127.0750), "식당", false),
-        Spot("L2", "좋아요 카페 B", LatLng(37.6240, 127.0800), "카페", false)
-    )
-    private val dislikedSpots = listOf(
-        Spot("D1", "싫어요 식당 C", LatLng(37.6265, 127.0760), "식당", false)
-    )
-    private val visitedSpots = listOf(
-        Spot("V1", "방문1 도깨비시장", LatLng(37.6256, 127.0782), "시장", true),
-        Spot("V2", "방문2 공릉철길", LatLng(37.6190, 127.0770), "공원", true),
-        Spot("V3", "미방문 베이커리", LatLng(37.6230, 127.0790), "빵집", false) // 미방문 예시
-    )*/
 
     private var currentMarkers = mutableListOf<Marker>()
     private var currentFilterType: String = "등록한 스팟" // 초기 필터 타입
@@ -148,13 +131,6 @@ class MyPageActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // View 초기화
         btnMyLocationCustom = findViewById(R.id.btnMyLocationCustom)
-
-
-        /*// MyPageViewModel에서 LiveData로 userPrefs에 저장된 값 반영
-        myPageViewModel.userLevel.observe(this) { level ->
-            updateLevelText(level)
-        }
-        myPageViewModel.loadUserData()*/
 
         tvFilterRegistered = findViewById(R.id.tvFilterRegistered)
         tvFilterLiked = findViewById(R.id.tvFilterLiked)

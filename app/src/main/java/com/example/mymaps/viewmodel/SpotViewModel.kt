@@ -15,13 +15,6 @@ class SpotViewModel(
     // XML UI에서 LiveData를 observe하면 값이 바뀔 때 자동으로 UI가 업데이트
     val allSpots: LiveData<List<SpotEntity>> = repository.getAllSpots()
 
-    // 모든 스팟 불러오기
-    /*fun loadSpots() {
-        viewModelScope.launch { // 백그라운드 작업 시작(코루틴)
-            allSpots.value = repository.getAllSpots() // DB에서 모든 스팟을 불러옴
-        }
-    }*/
-
     // 스팟 insert
     fun insertSpot(spot: SpotEntity) {
         viewModelScope.launch {

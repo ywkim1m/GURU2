@@ -35,7 +35,7 @@ class VisitedActivity : AppCompatActivity() {
 
         spot.let {
             tvTitle.text = "10 경험치 적립 완료!\n또 만나요 :)"
-            // 레벨별 뱃지 등
+            // 레벨별 뱃지
             ivBadge.setImageResource(getBadgeDrawableByLevel(userLevel))
         }
 
@@ -53,8 +53,7 @@ class VisitedActivity : AppCompatActivity() {
         goHomeButton.setOnClickListener {
             // MainActivity(홈)로 이동
             val intent = Intent(this, HomeActivity::class.java)
-            // 혹시 스택 초기화하고 싶으면 아래 주석 해제
-            // intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+
             startActivity(intent)
             finish()
         }

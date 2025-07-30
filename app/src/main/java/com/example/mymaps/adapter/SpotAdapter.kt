@@ -55,7 +55,7 @@ class SpotAdapter(private val onDeleteClick: (SpotEntity) -> Unit,
             if (spot.isVisited) {
                 visitStatusLayout.visibility = View.VISIBLE
                 tvVisitStatus.text = "방문 완료!"
-                // 날짜가 있다면 표시, 없으면 "방문일자 없음" 또는 공백 처리
+                // 날짜가 있다면 표시, 없으면 방문일자 없음 또는 공백 처리
                 tvVisitDate.text = spot.visitedAt ?: ""
             } else {
                 visitStatusLayout.visibility = View.GONE

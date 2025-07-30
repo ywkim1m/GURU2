@@ -59,6 +59,21 @@
             android:layout_marginEnd="8dp"/>
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/btnMyLocationCustom"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_below="@id/pinFilterContainer"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="70dp"
+        android:background="@drawable/circle_button_background"
+        android:contentDescription="내 위치"
+        android:src="@drawable/ic_my_location"
+        android:scaleType="fitCenter"
+        android:padding="8dp"
+        android:elevation="4dp" />
+
     <!-- 하단 바텀시트 (고정) -->
     <LinearLayout
         android:id="@+id/bottomSheet"

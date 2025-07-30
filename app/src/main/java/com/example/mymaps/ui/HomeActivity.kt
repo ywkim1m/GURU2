@@ -43,9 +43,6 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var goodImage: ImageView
     private lateinit var badImage: ImageView
 
-    private var isGoodSelected = false
-    private var isBadSelected = false
-
     private lateinit var chipGroupCategory: ChipGroup
     private var selectedCategory: String? = null
     private var allSpotList: List<SpotEntity> = emptyList()
@@ -77,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
             applyCategoryFilter()
             updateDescText()
 
-            // 스팟이 없으면 안내뷰만 보여주고, RecyclerView는 숨김
+            // 스팟이 없으면 안내뷰만 보여주고 RecyclerView는 숨김
             if (allSpotList.isEmpty()) {
                 emptyView.visibility = View.VISIBLE
                 recyclerView.visibility = View.GONE
@@ -104,14 +101,6 @@ class HomeActivity : AppCompatActivity() {
                 startActivity(intent) }
         )
         recyclerView.adapter = spotAdapter
-
-        // ViewModel에서 데이터 받아서 어댑터에 넣음
-        /*spotViewModel.allSpots.observe(this) { spots ->
-            allSpotList = spots.filter { it.isSaved }
-            setCategoryChips(makeCategoryList(allSpotList))
-            applyCategoryFilter()
-            updateDescText()
-        }*/
 
         // 스크롤(카드 넘김) 시 현재 position 갱신
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -247,7 +236,10 @@ class HomeActivity : AppCompatActivity() {
         "포토존" -> R.drawable.dot_yellow
         "쇼핑" -> R.drawable.dot_green
         "공원" -> R.drawable.dot_blue
-        else -> R.drawable.dot_gray // 기타 등등
+        else -> {
+            val resId = allSpotList.find { it.categoryName == category }?.categoryPinColorResId
+            if (resId != null && resId != 0) resId else R.drawable.dot_gray
+        }
     }
 
     // dp to px 확장 함수

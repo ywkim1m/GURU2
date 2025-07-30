@@ -163,7 +163,7 @@ class SpotEditActivity : AppCompatActivity() {
                 SpotCategory.ETC to categoryStr
             }
 
-            // 기존 spot의 id를 그대로 사용해야 "수정"됨!
+            // 기존 spot의 id를 그대로 사용해야 수정됨
             val updatedSpot = spot?.copy(
                 name = spotTitle,
                 description = spotDescription,

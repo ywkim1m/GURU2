@@ -131,7 +131,7 @@ class SpotDetailActivity : AppCompatActivity() {
         }
 
 
-        // '등록하기' 버튼 클릭 리스너, DB에 저장
+        // 등록하기 버튼 클릭 리스너, DB에 저장
         btnRegisterSpot.setOnClickListener {
             val spotTitle = etPlaceName.text.toString() // 장소명
             val spotDescription = etSpotDescription.text.toString() // 장소 설명
@@ -143,7 +143,7 @@ class SpotDetailActivity : AppCompatActivity() {
             var pickedCategoryPinColorResId = 0
             var categoryStr = "기타"
 
-            // ChipGroup에서 선택된(checked) Chip을 가져옴
+            // ChipGroup에서 선택된 Chip을 가져옴
             val checkedChipId = chipGroupCategories.checkedChipId
             if (checkedChipId != View.NO_ID) {
                 val checkedChip = chipGroupCategories.findViewById<Chip>(checkedChipId)
@@ -181,13 +181,13 @@ class SpotDetailActivity : AppCompatActivity() {
             finish()
         }
 
-        // '추가' 버튼 (btnAddCategory) 클릭 리스너
+        // 추가 버튼 (btnAddCategory) 클릭 리스너
         btnAddCategory.setOnClickListener {
             val intent = Intent(this, CategoryAdd::class.java)
             addCategoryLauncher.launch(intent)
         }
 
-        // '삭제' 버튼 (btnDeleteCategory) 클릭 리스너
+        // 삭제 버튼 (btnDeleteCategory) 클릭 리스너
         btnDeleteCategory.setOnClickListener {
             val selectedChipIds = chipGroupCategories.checkedChipIds
             val chipsToRemove = mutableListOf<Chip>()
